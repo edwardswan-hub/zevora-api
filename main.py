@@ -1,26 +1,16 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles # 备用：如果你以后有 CSS/JS 文件夹
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
-import os
+import os, httpx, psutil
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL is not set")
+AI_API_KEY = "sk-umjtlylioalvwivtwmfuewigndyxgdyrullstjuytotprbfj"
 
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 engine = create_async_engine(DATABASE_URL)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -28,33 +18,38 @@ AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=F
 @app.on_event("startup")
 async def startup():
     async with engine.begin() as conn:
-        await conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS messages (
-                id SERIAL PRIMARY KEY,
-                content TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """))
+        await conn.execute(text("CREATE TABLE IF NOT EXISTS messages (id SERIAL PRIMARY KEY, content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)"))
 
+# 1. 消息列表
 @app.get("/api/messages")
 async def get_messages():
     async with AsyncSessionLocal() as session:
-        result = await session.execute(text("SELECT * FROM messages ORDER BY id DESC"))
-        rows = result.mappings().all()
-        return {"items": rows}
+        result = await session.execute(text("SELECT * FROM messages ORDER BY id DESC LIMIT 10"))
+        return {"items": result.mappings().all()}
 
-@app.post("/api/messages")
-async def create_message(content: str):
-    async with AsyncSessionLocal() as session:
-        await session.execute(
-            text("INSERT INTO messages (content) VALUES (:content)"),
-            {"content": content}
+# 2. AI 聊天 (SiliconFlow)
+@app.post("/api/ai")
+async def ask_ai(data: dict):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "https://api.siliconflow.cn/v1/chat/completions",
+            headers={"Authorization": f"Bearer {AI_API_KEY}"},
+            json={
+                "model": "Qwen/Qwen2.5-7B-Instruct", # Qwen3 可能还没全量，先用 2.5 稳一手
+                "messages": [{"role": "user", "content": data['prompt'] + " (请用极简、拽拽的GenZ语气回答)"}]
+            }
         )
-        await session.commit()
-        return {"success": True}
+        return response.json()
 
-# 这里的顺序很重要：根路由放在最后
-@app.get("/", response_class=HTMLResponse)
+# 3. 极简监控
+@app.get("/api/stats")
+async def get_stats():
+    return {
+        "cpu": f"{psutil.cpu_percent()}%",
+        "ram": f"{psutil.virtual_memory().percent}%",
+        "disk": f"{psutil.disk_usage('/').percent}%"
+    }
+
+@app.get("/")
 async def root():
-    # 只要 index.html 在 Docker 里的 /app 目录下就能读到
     return FileResponse("index.html")
