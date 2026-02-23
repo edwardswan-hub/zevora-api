@@ -1,69 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN" class="dark scroll-smooth">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zevora OS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: #0a0a0a; color: #e5e5e5; font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .accent { color: #00ff9d; } /* Billie Neon Green */
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JULIAN. / Omnia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap');
+    :root { --bg: #050505; --text-primary: #f8f8f8; --border: #222222; }
+    body { background-color: var(--bg); color: var(--text-primary); font-family: 'Inter', sans-serif; }
+    .noise { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
+    .font-serif { font-family: 'Playfair Display', serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .prose { max-width: 65ch; margin: 0 auto; font-size: 1.125rem; line-height: 1.8; color: #d1d5db; }
+    .prose h1 { font-family: 'Playfair Display', serif; font-size: 3rem; font-weight: 800; color: #fff; }
+    .prose a { color: #fff; border-bottom: 1px solid #666; transition: 0.3s; }
+    .prose a:hover { border-bottom-color: #fff; }
+    .reader-overlay { transition: opacity 0.5s ease; }
+    ::-webkit-scrollbar { width: 2px; }
+    ::-webkit-scrollbar-thumb { background: #444; }
+  </style>
 </head>
-<body class="p-6 md:p-12">
-    <div class="max-w-4xl mx-auto space-y-8">
-        <header class="flex justify-between items-end border-b border-white/10 pb-4">
-            <div>
-                <h1 class="text-4xl font-bold tracking-tighter">ZEVORA <span class="accent">v2.0</span></h1>
-                <p class="text-sm text-gray-500">Welcome back, Julian.</p>
-            </div>
-            <div id="stats" class="text-xs space-x-4 text-gray-400 font-mono">
-                <span>CPU: --</span><span>RAM: --</span>
-            </div>
-        </header>
-
-        <div class="grid md:grid-cols-2 gap-8">
-            <section class="glass p-6 rounded-2xl space-y-4">
-                <h2 class="text-xl font-semibold italic">'Cause I'm the Bad Guy...</h2>
-                <div id="ai-response" class="h-32 text-sm text-gray-400 overflow-y-auto bg-black/20 p-3 rounded">
-                    Ask me anything. I'm smarter than your homework.
-                </div>
-                <div class="flex gap-2">
-                    <input id="ai-input" class="bg-white/5 border border-white/10 rounded-lg px-3 py-2 w-full outline-none focus:border-green-500 transition" placeholder="Say something...">
-                    <button onclick="askAI()" class="bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-green-400 transition">GO</button>
-                </div>
-            </section>
-
-            <section class="glass p-6 rounded-2xl space-y-4">
-                <h2 class="text-xl font-semibold">Memories</h2>
-                <div id="messages" class="space-y-2 text-sm max-h-48 overflow-y-auto">
-                    </div>
-            </section>
-        </div>
+<body class="selection:bg-white selection:text-black antialiased relative">
+  <div class="noise"></div>
+  <header class="fixed top-0 w-full z-40 bg-gradient-to-b from-[#050505] to-transparent pt-6 pb-12 px-8 flex justify-between items-start mix-blend-difference">
+    <div class="text-xs uppercase tracking-[0.2em] font-medium text-gray-400">
+      <span id="liveTime">00:00:00</span> <br> CHENGDU, CHN
     </div>
+    <div class="text-center cursor-pointer" onclick="window.scrollTo(0,0)">
+      <h1 class="font-serif text-3xl font-bold tracking-tighter">JULIAN.</h1>
+    </div>
+    <div class="text-right"><button id="cmdBtn" class="text-xs uppercase tracking-[0.2em] font-medium text-gray-400">MENU / CMD+K</button></div>
+  </header>
 
-    <script>
-        async function fetchStats() {
-            const res = await fetch('/api/stats');
-            const data = await res.json();
-            document.getElementById('stats').innerHTML = `CPU: ${data.cpu} | RAM: ${data.ram} | DISK: ${data.disk}`;
+  <main class="pt-40 pb-32 px-8 max-w-6xl mx-auto">
+    <section class="mb-32">
+      <h2 class="font-serif text-[10vw] leading-[0.85] font-extrabold tracking-tighter text-[#f8f8f8] mb-8">Chaos,<br><span class="text-gray-600 italic font-normal">Synthesized.</span></h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-[#222] pt-8">
+        <div class="col-span-1 md:col-span-2"><p class="text-xl text-gray-400 font-light leading-relaxed max-w-xl">In Omnia Paratus. Building systems and surviving high school.</p></div>
+        <div class="text-sm text-gray-500 font-mono flex flex-col justify-end"><p id="status">STATUS: ONLINE</p><p>BGM: THE TORTURED POETS DEPARTMENT</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="flex justify-between items-end border-b border-[#333] pb-4 mb-8">
+        <h3 class="text-xs uppercase tracking-[0.2em] text-gray-400">The Archive</h3>
+        <button id="newPostBtn" class="text-xs uppercase tracking-[0.2em] text-white">+ New Entry</button>
+      </div>
+      <div id="postList" class="flex flex-col"></div>
+    </section>
+  </main>
+
+  <div id="readerOverlay" class="fixed inset-0 bg-[#050505] z-50 hidden opacity-0 reader-overlay overflow-y-auto">
+    <nav class="sticky top-0 w-full px-8 py-6 flex justify-between items-center bg-[#050505]/90 backdrop-blur-md z-10 border-b border-[#111]">
+      <button onclick="hideReader()" class="text-xs uppercase tracking-[0.2em] text-gray-400">← Return</button>
+      <button id="btnSave" class="text-xs uppercase tracking-[0.2em] text-white">Publish</button>
+    </nav>
+    <div class="max-w-3xl mx-auto px-8 py-20" id="readerContent">
+      <div id="editMode" class="flex flex-col gap-6">
+        <input id="eTitle" class="w-full bg-transparent font-serif text-5xl font-bold text-white outline-none" placeholder="Title">
+        <input id="eTags" class="bg-transparent font-mono text-xs text-gray-500 outline-none uppercase" placeholder="TAGS (COMMA SEPARATED)">
+        <textarea id="eBody" class="w-full h-96 bg-transparent text-gray-300 font-mono text-sm outline-none resize-none" placeholder="# Start writing..."></textarea>
+      </div>
+      <div id="viewMode" class="hidden"><h1 id="vTitle" class="font-serif text-6xl mb-8"></h1><article id="vBody" class="prose"></article></div>
+    </div>
+  </div>
+
+  <div id="cmd" class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm">
+    <div class="w-full max-w-2xl px-8">
+      <input id="cmdInput" class="w-full bg-transparent text-3xl font-serif text-white outline-none border-b border-[#333] pb-4" placeholder="Type /ai <query> or search...">
+      <div id="cmdResults" class="mt-4 font-mono text-sm text-gray-500"></div>
+    </div>
+  </div>
+
+  <script>
+    let posts = [];
+    const $ = (id) => document.getElementById(id);
+
+    async function updateStats() {
+      const res = await fetch('/api/stats');
+      const data = await res.json();
+      $('liveTime').innerText = `${new Date().toLocaleTimeString()} | CPU ${data.cpu}% | RAM ${data.ram}%`;
+    }
+    setInterval(updateStats, 5000);
+
+    const renderList = () => {
+      $('postList').innerHTML = posts.map(p => `
+        <button onclick="openPost('${p.id}')" class="w-full text-left py-8 border-b border-[#111] hover:border-[#333] transition">
+          <h4 class="font-serif text-3xl text-white">${p.title}</h4>
+          <p class="text-xs font-mono text-gray-500 uppercase mt-2">${p.date} · ${p.tags.join(' · ')}</p>
+        </button>
+      `).join('');
+    };
+
+    const loadPosts = async () => {
+      const res = await fetch('/api/messages');
+      posts = await res.json();
+      renderList();
+    };
+
+    const openPost = (id) => {
+      const p = posts.find(x => x.id == id);
+      $('vTitle').innerText = p.title;
+      $('vBody').innerHTML = DOMPurify.sanitize(marked.parse(p.body));
+      $('editMode').classList.add('hidden');
+      $('viewMode').classList.remove('hidden');
+      $('readerOverlay').classList.remove('hidden');
+      $('readerOverlay').classList.remove('opacity-0');
+    };
+
+    $('newPostBtn').onclick = () => {
+      $('viewMode').classList.add('hidden');
+      $('editMode').classList.remove('hidden');
+      $('readerOverlay').classList.remove('hidden');
+      $('readerOverlay').classList.remove('opacity-0');
+    };
+
+    $('btnSave').onclick = async () => {
+      await fetch('/api/messages', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({title: $('eTitle').value, body: $('eBody').value, tags: $('eTags').value})
+      });
+      location.reload();
+    };
+
+    const hideReader = () => { $('readerOverlay').classList.add('hidden'); };
+
+    $('cmdInput').onkeydown = async (e) => {
+      if (e.key === 'Enter') {
+        const val = e.target.value;
+        if (val.startsWith('/ai ')) {
+          $('cmdResults').innerText = "Thinking...";
+          const res = await fetch('/api/ai', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({prompt: val.slice(4)})});
+          const data = await res.json();
+          $('cmdResults').innerText = data.choices[0].message.content;
         }
-        async function askAI() {
-            const input = document.getElementById('ai-input');
-            const box = document.getElementById('ai-response');
-            box.innerText = "Thinking...";
-            const res = await fetch('/api/ai', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({prompt: input.value})
-            });
-            const data = await res.json();
-            box.innerText = data.choices[0].message.content;
-            input.value = '';
-        }
-        setInterval(fetchStats, 5000);
-        fetchStats();
-    </script>
+      }
+    };
+
+    window.addEventListener('keydown', e => { if (e.metaKey && e.key === 'k') $('cmd').classList.toggle('hidden'); });
+    loadPosts();
+  </script>
 </body>
 </html>
