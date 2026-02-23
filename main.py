@@ -15,7 +15,7 @@ app = FastAPI()
 async def health():
     async with engine.connect() as conn:
         r = await conn.execute(text("SELECT 1 as ok;"))
-        return {"ok": True, "db": r.mappings().first()["ok"]}
+        return {"ok": True, "db": ..., "from": "local-dev"}
 
 @app.post("/notes")
 async def create_note(msg: str):
