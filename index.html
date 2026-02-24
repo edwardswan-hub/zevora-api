@@ -101,7 +101,7 @@
       const fd = new FormData();
       fd.append('username', $('user').value);
       fd.append('password', $('pass').value);
-      const res = await fetch('/token', { method: 'POST', body: fd });
+      const res = await fetch('/api/token', { method: 'POST', body: fd });
       const data = await res.json();
       if(data.access_token) {
         localStorage.setItem('token', data.access_token);
