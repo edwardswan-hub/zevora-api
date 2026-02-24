@@ -34,7 +34,7 @@
       <h2 class="font-serif text-[10vw] md:text-[6vw] leading-none font-extrabold tracking-tighter mb-8">
         Chaos,<br><span class="text-gray-600 italic">Synthesized.</span>
       </h2>
-      <p class="text-gray-400 font-light max-w-xl text-lg">In Omnia Paratus. 正在监控服务器频率与灵魂波动。？？？</p>
+      <p class="text-gray-400 font-light max-w-xl text-lg">In Omnia Paratus. 正在监控服务器频率与灵魂波动。</p>
     </section>
 
     <section id="adminPanel" class="hidden border-t border-[#222] pt-12">
@@ -97,11 +97,18 @@
       `).join('');
     }
 
+    // ⚠️ 终极修复版的登录逻辑：使用 URLSearchParams
     async function login() {
-      const fd = new FormData();
-      fd.append('username', $('user').value);
-      fd.append('password', $('pass').value);
-      const res = await fetch('/api/token', { method: 'POST', body: fd });
+      const params = new URLSearchParams();
+      params.append('username', $('user').value);
+      params.append('password', $('pass').value);
+      
+      const res = await fetch('/api/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: params
+      });
+      
       const data = await res.json();
       if(data.access_token) {
         localStorage.setItem('token', data.access_token);
@@ -131,20 +138,20 @@
       $('postForm').classList.remove('hidden');
       $('authBtn').innerText = "[ ACCESS GRANTED ]";
 
-      // 1. 系统状态轮询
       setInterval(async () => {
-        const res = await fetch('/api/sys/stats', { headers: { 'Authorization': `Bearer ${token}` } });
-        const s = await res.json();
-        $('dash-cpu').innerText = s.cpu + '%';
-        $('dash-ram').innerText = s.ram + '%';
-        $('dash-docker').innerText = s.docker;
-        $('sysStats').innerText = `CPU ${s.cpu}% | RAM ${s.ram}%`;
+        try {
+          const res = await fetch('/api/sys/stats', { headers: { 'Authorization': `Bearer ${token}` } });
+          const s = await res.json();
+          $('dash-cpu').innerText = s.cpu + '%';
+          $('dash-ram').innerText = s.ram + '%';
+          $('dash-docker').innerText = s.docker;
+          $('sysStats').innerText = `CPU ${s.cpu}% | RAM ${s.ram}%`;
+        } catch(e) {}
       }, 5000);
 
-      // 2. 加载代码
       const codeRes = await fetch('/api/editor/read?filename=main.py', { headers: { 'Authorization': `Bearer ${token}` } });
       const codeData = await codeRes.json();
-      $('editor').value = codeData.content;
+      if(codeData.content) $('editor').value = codeData.content;
     }
 
     async function saveCode() {
