@@ -39,8 +39,13 @@ app.add_middleware(
 )
 
 # --- 工具函数 ---
+# 🛡️ 终极防弹版密码验证，超长密码直接截断，防暴毙！
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+    safe_password = plain_password[:72] if len(plain_password) > 72 else plain_password
+    try:
+        return pwd_context.verify(safe_password, hashed_password)
+    except Exception:
+        return False
 
 def create_access_token(data: dict):
     to_encode = data.copy()
