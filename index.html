@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JULIAN. / Omnia</title>
 
-  <!-- Tailwind, Marked.js (Markdown), DOMPurify (Safety) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
@@ -27,7 +26,7 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Film Grain Noise Effect */
+    /* 胶片颗粒噪点效果 */
     .noise {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
       pointer-events: none; z-index: 9999; opacity: 0.04;
@@ -37,22 +36,13 @@
     .font-serif { font-family: 'Playfair Display', serif; }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-    /* Flawless Markdown Styling */
+    /* Markdown 样式修饰 */
     .prose { max-width: 65ch; margin: 0 auto; font-size: 1.125rem; line-height: 1.8; color: #d1d5db; }
-    .prose h1, .prose h2, .prose h3 { font-family: 'Playfair Display', serif; color: #fff; margin-top: 2.5rem; margin-bottom: 1rem; font-weight: 800; }
-    .prose h1 { font-size: 2.5rem; line-height: 1.1; }
-    .prose h2 { font-size: 1.8rem; }
+    .prose h1, .prose h2 { font-family: 'Playfair Display', serif; color: #fff; margin-top: 2.5rem; margin-bottom: 1rem; font-weight: 800; }
     .prose p { margin-bottom: 1.5rem; font-weight: 300; }
-    .prose a { color: #fff; text-decoration: none; border-bottom: 1px solid var(--accent); transition: border-color 0.3s ease; }
-    .prose a:hover { border-bottom-color: #fff; }
-    .prose blockquote { border-left: 2px solid #444; padding-left: 1.5rem; margin: 1.5rem 0; font-style: italic; color: #9ca3af; }
-    .prose pre { background: #0a0a0a; padding: 1.5rem; border: 1px solid var(--border); border-radius: 8px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; margin-bottom: 1.5rem; }
     .prose code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; background: #1a1a1a; padding: 0.1rem 0.3rem; border-radius: 4px; color: #e5e5e5; }
-    .prose pre code { background: transparent; padding: 0; border-radius: 0; }
-    .prose ul { list-style-type: square; padding-left: 1.5rem; margin-bottom: 1.5rem; }
-    .prose li { margin-bottom: 0.5rem; }
 
-    /* Transitions & Animations */
+    /* 动效 */
     .hover-underline { position: relative; text-decoration: none; }
     .hover-underline::after {
       content: ''; position: absolute; width: 100%; transform: scaleX(0); height: 1px; bottom: -2px; left: 0; background-color: currentColor; transform-origin: bottom right; transition: transform 0.4s cubic-bezier(0.86, 0, 0.07, 1);
@@ -61,22 +51,16 @@
     
     .overlay-enter { opacity: 0; pointer-events: none; }
     .overlay-enter-active { opacity: 1; pointer-events: auto; transition: opacity 0.4s ease; }
-    .content-enter { transform: translateY(20px); }
-    .content-enter-active { transform: translateY(0); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
 
-    /* Custom Scrollbar */
+    /* 自定义滚动条 */
     ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #555; }
   </style>
 </head>
 
 <body class="selection:bg-white selection:text-black antialiased">
-
   <div class="noise"></div>
 
-  <!-- Header -->
   <header class="fixed top-0 w-full z-40 bg-gradient-to-b from-[#050505] to-transparent pt-6 pb-12 px-8 flex justify-between items-start mix-blend-difference">
     <div class="text-[10px] md:text-xs uppercase tracking-[0.2em] font-medium text-gray-500 font-mono leading-relaxed">
       <span id="liveTime">00:00:00</span> <br>
@@ -92,10 +76,8 @@
     </div>
   </header>
 
-  <!-- Main Interface -->
-  <main class="pt-40 pb-32 px-6 md:px-8 max-w-5xl mx-auto min-h-screen flex flex-col justify-between">
+  <main class="pt-40 pb-32 px-6 md:px-8 max-w-5xl mx-auto min-h-screen flex flex-col">
     
-    <!-- Hero Section -->
     <section class="mb-24">
       <h2 class="font-serif text-[12vw] md:text-[8vw] leading-[0.9] font-extrabold tracking-tighter text-[#f8f8f8] mb-8">
         Chaos,<br>
@@ -115,84 +97,44 @@
       </div>
     </section>
 
-    <!-- Archive Section -->
     <section class="flex-1">
       <div class="flex justify-between items-end border-b border-[#333] pb-4 mb-8">
-        <h3 class="text-xs uppercase tracking-[0.2em] text-gray-400 font-mono">The Archive</h3>
-        <button onclick="openEditor()" class="text-xs uppercase tracking-[0.2em] hover-underline text-white font-mono">+ New Entry</button>
+        <h3 class="text-xs uppercase tracking-[0.2em] text-gray-400 font-mono">The Wall</h3>
+        <button id="authBtn" onclick="toggleAuth()" class="text-xs uppercase tracking-[0.2em] hover-underline text-white font-mono">
+          [ AUTH REQUIRED ]
+        </button>
       </div>
 
-      <div id="postList" class="flex flex-col">
-        <div class="py-12 text-center text-gray-600 font-mono text-sm animate-pulse">Loading fragments...</div>
+      <div id="postForm" class="hidden mb-16 space-y-6">
+        <textarea id="msgInput" class="w-full bg-transparent border-b border-[#222] py-4 text-xl font-serif text-white outline-none focus:border-white transition-colors placeholder-gray-800" placeholder="Post a fragment..."></textarea>
+        <div class="flex justify-end">
+          <button onclick="sendMsg()" class="text-xs uppercase tracking-widest bg-white text-black px-6 py-2 font-bold hover:bg-gray-200 transition-colors">Submit Entry</button>
+        </div>
+      </div>
+
+      <div id="postList" class="flex flex-col space-y-12">
+        <div class="py-12 text-center text-gray-600 font-mono text-sm animate-pulse">Synchronizing fragments...</div>
       </div>
     </section>
   </main>
 
-  <!-- Reader / Editor Overlay -->
-  <div id="overlay" class="fixed inset-0 bg-[#050505] z-50 overlay-enter overflow-y-auto">
-    
-    <nav class="sticky top-0 w-full px-6 md:px-8 py-6 flex justify-between items-center bg-[#050505]/95 backdrop-blur-md z-10 border-b border-[#111]">
-      <button onclick="closeOverlay()" class="text-xs uppercase tracking-[0.2em] text-gray-400 hover-underline flex items-center gap-2 font-mono">
-        ← Return
-      </button>
-      <div class="flex gap-6 font-mono">
-        <button id="btnPublish" onclick="publishPost()" class="text-xs uppercase tracking-[0.2em] text-white hover-underline hidden">Publish</button>
-      </div>
-    </nav>
-
-    <div class="max-w-3xl mx-auto px-6 md:px-8 py-16 content-enter" id="overlayContent">
-      
-      <!-- View Mode -->
-      <div id="viewMode" class="hidden">
-        <div class="mb-16 md:text-center">
-          <p id="vMeta" class="text-xs uppercase tracking-[0.2em] text-gray-500 mb-6 font-mono"></p>
-          <h1 id="vTitle" class="font-serif text-4xl md:text-6xl font-bold leading-tight text-white mb-8"></h1>
-        </div>
-        <article id="vBody" class="prose"></article>
-      </div>
-
-      <!-- Edit Mode -->
-      <div id="editMode" class="hidden flex flex-col h-full min-h-[60vh]">
-        <input id="eTitle" class="w-full bg-transparent font-serif text-3xl md:text-5xl font-bold text-white outline-none mb-8 placeholder-gray-800" placeholder="A brilliant title...">
-        <div class="flex gap-4 mb-8 border-b border-[#222] pb-6">
-          <input id="eTags" class="flex-1 bg-transparent font-mono text-xs md:text-sm text-gray-400 outline-none uppercase tracking-widest placeholder-gray-800" placeholder="TAGS (e.g. VIBES, CODE)">
-        </div>
-        <textarea id="eBody" class="flex-1 w-full h-[50vh] bg-transparent text-gray-300 font-mono text-sm leading-relaxed outline-none resize-none placeholder-gray-800" placeholder="# Start writing the truth here...\n\n(Markdown supported)"></textarea>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- CMD+K Palette -->
-  <div id="cmdPalette" class="fixed inset-0 z-[100] overlay-enter flex items-start justify-center pt-[20vh]">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="toggleCmd()"></div>
-    <div class="relative w-full max-w-2xl px-6 content-enter" id="cmdBox">
-      <div class="bg-[#0a0a0a] border border-[#222] rounded-xl shadow-2xl overflow-hidden">
-        <div class="flex items-center px-6 py-4 border-b border-[#222]">
-          <span class="text-gray-500 font-mono mr-4">~</span>
-          <input id="cmdInput" type="text" class="w-full bg-transparent text-lg md:text-xl font-serif text-white outline-none placeholder-gray-700" placeholder="Type /ai <query> or search archive..." autocomplete="off">
-        </div>
-        <div id="cmdResults" class="px-6 py-4 max-h-[40vh] overflow-y-auto font-mono text-sm text-gray-400">
-          <div class="text-gray-600 space-y-2">
-            <p>Commands:</p>
-            <p><span class="text-white">/ai [prompt]</span> - Ask Qwen anything</p>
-            <p><span class="text-white">[text]</span> - Search your archive</p>
-          </div>
-        </div>
+  <div id="authOverlay" class="fixed inset-0 bg-[#050505]/95 z-50 flex items-center justify-center overlay-enter hidden">
+    <div class="max-w-xs w-full px-6 text-center">
+      <h3 class="font-serif text-2xl mb-8">Identify Yourself, Sir.</h3>
+      <input id="username" type="text" placeholder="IDENTITY" class="w-full bg-transparent border-b border-[#222] py-3 mb-4 outline-none text-center font-mono text-sm focus:border-white transition-colors">
+      <input id="password" type="password" placeholder="PASSPHRASE" class="w-full bg-transparent border-b border-[#222] py-3 mb-8 outline-none text-center font-mono text-sm focus:border-white transition-colors">
+      <div class="flex flex-col gap-4">
+        <button onclick="login()" class="text-xs uppercase tracking-widest bg-white text-black py-3 font-bold">Verify</button>
+        <button onclick="toggleAuth()" class="text-xs uppercase tracking-widest text-gray-500 py-2">Abort</button>
       </div>
     </div>
   </div>
 
   <script>
-    // --- Global State ---
-    let posts = [];
     const $ = (id) => document.getElementById(id);
-
-    // --- Configuration: Markdown ---
     marked.setOptions({ gfm: true, breaks: true });
-    const renderMarkdown = (md) => DOMPurify.sanitize(marked.parse(md || ""));
 
-    // --- Time & Sys Stats ---
+    // --- 时钟 & 系统状态 ---
     function updateClock() {
       const now = new Date();
       $('liveTime').innerText = now.toLocaleTimeString("en-US", { hour12: false, timeZone: "Asia/Shanghai" }) + " CST";
@@ -200,194 +142,101 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    async function fetchStats() {
-      try {
-        const res = await fetch('/api/stats');
-        const data = await res.json();
-        $('sysStats').innerText = `CPU ${data.cpu}% · RAM ${data.ram}%`;
-      } catch (e) {
-        $('sysStats').innerText = `SYS: OFFLINE`;
-      }
-    }
-    setInterval(fetchStats, 5000);
-    fetchStats();
-
-    // --- API & Data Handling ---
-    async function loadPosts() {
+    // --- 数据交互 ---
+    async function loadMessages() {
       try {
         const res = await fetch('/api/messages');
-        posts = await res.json();
-        renderPostList();
+        const data = await res.json();
+        renderMessages(data.items);
       } catch (e) {
-        $('postList').innerHTML = `<div class="py-12 text-gray-600 font-mono text-sm">Failed to connect to backend. Are you running the FastAPI server?</div>`;
+        $('postList').innerHTML = `<div class="text-gray-600 font-mono text-xs text-center">SYNC FAILED.</div>`;
       }
     }
 
-    function renderPostList(filterTerm = "") {
+    function renderMessages(items) {
       const container = $('postList');
-      const term = filterTerm.toLowerCase();
-      const filtered = posts.filter(p => (p.title + p.body + p.tags.join('')).toLowerCase().includes(term));
-
-      if (filtered.length === 0) {
-        container.innerHTML = `<div class="py-12 text-gray-600 font-mono text-sm">No entries found.</div>`;
+      if (!items || items.length === 0) {
+        container.innerHTML = `<div class="text-gray-600 font-mono text-xs text-center">EMPTY ARCHIVE.</div>`;
         return;
       }
-
-      container.innerHTML = filtered.map(p => `
-        <button onclick="viewPost('${p.id}')" class="group w-full text-left py-8 border-b border-[#111] hover:border-[#333] transition-colors flex flex-col md:flex-row md:items-baseline md:justify-between gap-4">
-          <div>
-            <h4 class="font-serif text-2xl md:text-3xl text-white tracking-tight group-hover:opacity-80 transition-opacity">
-              ${escapeHTML(p.title)}
-            </h4>
-            <p class="mt-2 text-xs uppercase tracking-[0.2em] text-gray-500 font-mono">
-              ${p.date}
-            </p>
-          </div>
-          <div class="text-xs uppercase tracking-[0.2em] text-gray-600 font-mono">
-            ${escapeHTML(p.tags.join(' · '))}
-          </div>
-        </button>
+      container.innerHTML = items.map(item => `
+        <article class="group relative">
+          <div class="text-[10px] text-gray-600 font-mono mb-2 uppercase tracking-widest">${item.created_at || 'FRAGMENT'}</div>
+          <div class="prose prose-invert">${DOMPurify.sanitize(marked.parse(item.content))}</div>
+          <div class="h-px w-0 bg-[#333] group-hover:w-full transition-all duration-700 mt-8"></div>
+        </article>
       `).join('');
     }
 
-    const escapeHTML = (s) => String(s).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[m]);
+    // --- 认证逻辑 ---
+    async function login() {
+      const formData = new FormData();
+      formData.append('username', $('username').value);
+      formData.append('password', $('password').value);
 
-    // --- Overlay UI Logic ---
-    function openEditor() {
-      $('vTitle').innerText = ''; $('vBody').innerHTML = '';
-      $('eTitle').value = ''; $('eTags').value = ''; $('eBody').value = '';
+      const res = await fetch("/token", { method: "POST", body: formData });
+      const data = await res.json();
       
-      $('viewMode').classList.add('hidden');
-      $('editMode').classList.remove('hidden');
-      $('btnPublish').classList.remove('hidden');
-      
-      showOverlay();
-      setTimeout(() => $('eTitle').focus(), 400);
-    }
-
-    function viewPost(id) {
-      const p = posts.find(x => x.id == id);
-      if (!p) return;
-
-      $('vTitle').innerText = p.title;
-      $('vMeta').innerText = `${p.date} · ${p.tags.join(' · ')}`;
-      $('vBody').innerHTML = renderMarkdown(p.body);
-
-      $('editMode').classList.add('hidden');
-      $('btnPublish').classList.add('hidden');
-      $('viewMode').classList.remove('hidden');
-      
-      showOverlay();
-    }
-
-    async function publishPost() {
-      const title = $('eTitle').value.trim() || "Untitled";
-      const tags = $('eTags').value.trim() || "VIBES";
-      const body = $('eBody').value.trim();
-
-      if (!body && title === "Untitled") {
-        closeOverlay(); return; // don't save empty trash
-      }
-
-      $('btnPublish').innerText = "Saving...";
-      try {
-        await fetch('/api/messages', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, body, tags })
-        });
-        await loadPosts();
-        closeOverlay();
-      } catch (e) {
-        alert("Failed to save to database. Check console.");
-      } finally {
-        $('btnPublish').innerText = "Publish";
-      }
-    }
-
-    function showOverlay() {
-      const o = $('overlay'), c = $('overlayContent');
-      o.classList.remove('overlay-enter', 'hidden');
-      o.classList.add('overlay-enter-active');
-      c.classList.remove('content-enter');
-      c.classList.add('content-enter-active');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeOverlay() {
-      const o = $('overlay'), c = $('overlayContent');
-      o.classList.remove('overlay-enter-active');
-      o.classList.add('overlay-enter');
-      c.classList.remove('content-enter-active');
-      c.classList.add('content-enter');
-      setTimeout(() => { o.classList.add('hidden'); document.body.style.overflow = ''; }, 400);
-    }
-
-    // --- CMD+K / AI Logic ---
-    function toggleCmd() {
-      const p = $('cmdPalette'), b = $('cmdBox');
-      if (p.classList.contains('overlay-enter')) {
-        p.classList.remove('overlay-enter', 'hidden');
-        p.classList.add('overlay-enter-active');
-        b.classList.remove('content-enter');
-        b.classList.add('content-enter-active');
-        setTimeout(() => $('cmdInput').focus(), 100);
+      if (data.access_token) {
+        localStorage.setItem('token', data.access_token);
+        checkAuth();
+        toggleAuth();
+        $('username').value = ''; $('password').value = '';
       } else {
-        p.classList.remove('overlay-enter-active');
-        p.classList.add('overlay-enter');
-        b.classList.remove('content-enter-active');
-        b.classList.add('content-enter');
-        setTimeout(() => p.classList.add('hidden'), 400);
+        alert("ACCESS DENIED.");
       }
     }
 
-    $('cmdInput').addEventListener('keydown', async (e) => {
-      if (e.key === 'Enter') {
-        const val = e.target.value.trim();
-        if (val.startsWith('/ai ')) {
-          const prompt = val.substring(4);
-          $('cmdResults').innerHTML = `<div class="animate-pulse text-white font-serif italic">"I'm thinking, don't rush me..."</div>`;
-          try {
-            const res = await fetch('/api/ai', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ prompt })
-            });
-            const data = await res.json();
-            const aiText = data.choices[0].message.content;
-            $('cmdResults').innerHTML = `<div class="prose prose-sm !text-gray-300 !max-w-none bg-white/5 p-4 rounded-lg border border-white/10">${renderMarkdown(aiText)}</div>`;
-          } catch(err) {
-            $('cmdResults').innerHTML = `<div class="text-red-400">Connection error. The AI went to sleep.</div>`;
-          }
-        } else {
-           // Search logic
-           renderPostList(val);
-           toggleCmd();
-        }
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      if (token) {
+        $('authBtn').innerText = "[ ACCESS GRANTED ]";
+        $('postForm').classList.remove('hidden');
+      } else {
+        $('authBtn').innerText = "[ AUTH REQUIRED ]";
+        $('postForm').classList.add('hidden');
       }
-    });
+    }
 
-    $('cmdInput').addEventListener('input', (e) => {
-       const val = e.target.value;
-       if(!val.startsWith('/ai ')) {
-         renderPostList(val); // live search
-       }
-    });
+    async function sendMsg() {
+      const input = $('msgInput');
+      const token = localStorage.getItem('token');
+      if (!input.value.trim()) return;
 
-    // --- Global Keybindings ---
-    window.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        toggleCmd();
+      const res = await fetch("/api/messages?content=" + encodeURIComponent(input.value), {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      
+      if (res.status === 401) {
+        alert("SESSION EXPIRED.");
+        localStorage.removeItem('token');
+        checkAuth();
+        return;
       }
-      if (e.key === 'Escape') {
-        if (!$('cmdPalette').classList.contains('overlay-enter')) toggleCmd();
-        else if (!$('overlay').classList.contains('overlay-enter')) closeOverlay();
-      }
-    });
+      input.value = "";
+      loadMessages();
+    }
 
-    // Boot up
-    loadPosts();
+    // --- UI 交互 ---
+    function toggleAuth() {
+      const o = $('authOverlay');
+      if (o.classList.contains('hidden')) {
+        o.classList.remove('hidden');
+        setTimeout(() => o.classList.add('overlay-enter-active'), 10);
+      } else {
+        o.classList.remove('overlay-enter-active');
+        setTimeout(() => o.classList.add('hidden'), 400);
+      }
+    }
+
+    function toggleCmd() {
+      alert("System Command: Julian, try focusing on the music first. (WIP)");
+    }
+
+    // 初始化
+    checkAuth();
+    loadMessages();
   </script>
 </body>
 </html>
