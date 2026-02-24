@@ -14,14 +14,15 @@ from sqlalchemy import text
 from pydantic import BaseModel
 
 # --- 配置 ---
-SECRET_KEY = "15884417321aaaaA" # 建议保持与之前一致
+SECRET_KEY = "15884417321aaaaA" 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 USERNAME = "Julian"
 HASHED_PASSWORD = "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGGa31S." 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+# ⚠️ 注意这里：路径统一为 /api/token
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_async_engine(DATABASE_URL)
@@ -65,8 +66,8 @@ async def startup():
 
 # --- 核心路由 ---
 
-# 登录
-@app.post("/token")
+# ⚠️ 登录接口：路径改为 /api/token，匹配前端和 Nginx
+@app.post("/api/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if form_data.username != USERNAME or not verify_password(form_data.password, HASHED_PASSWORD):
         raise HTTPException(status_code=400, detail="Incorrect credentials")
@@ -102,7 +103,6 @@ async def get_sys_stats(current_user: str = Depends(get_current_user)):
 # 读取代码
 @app.get("/api/editor/read")
 async def read_code(filename: str, current_user: str = Depends(get_current_user)):
-    # 限制只能读取当前目录文件
     path = os.path.join("/app", filename)
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as f:
