@@ -1,6 +1,7 @@
 FROM python:3.11-slim
 WORKDIR /app
 # 安装所有需要的依赖
+pip install psutil
 # 增加 python-jose 和 passlib 用于加密和 Token 生成
 RUN pip install --no-cache-dir fastapi uvicorn sqlalchemy asyncpg python-jose[cryptography] passlib[bcrypt]
 RUN pip install --no-cache-dir fastapi uvicorn sqlalchemy asyncpg psutil httpx
