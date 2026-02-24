@@ -1,78 +1,83 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.middleware.cors import CORSMiddleware
+import os
+from datetime import datetime, timedelta
+from typing import Optional
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.responses import HTMLResponse
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import text
-import os, httpx, psutil, datetime
 
-# 配置环境
+# 配置信息
+SECRET_KEY = "15884417321aaaaA" # 换个复杂的
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 24小时有效
+
+# 模拟一个用户 (实际上你应该存数据库，这里先硬编码)
+USERNAME = "Julian"
+# 这是 '15884417321aaaaA' 的哈希值（建议你自己生成）
+HASHED_PASSWORD = "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGGa31S." 
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 DATABASE_URL = os.getenv("DATABASE_URL")
-AI_API_KEY = "sk-umjtlylioalvwivtwmfuewigndyxgdyrullstjuytotprbfj"
-
-app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
-# 数据库配置
 engine = create_async_engine(DATABASE_URL)
 AsyncSessionLocal = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+app = FastAPI()
+
+# 工具函数
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+# 获取当前用户
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username != USERNAME:
+            raise HTTPException(status_code=401)
+        return username
+    except JWTError:
+        raise HTTPException(status_code=401)
 
 @app.on_event("startup")
 async def startup():
     async with engine.begin() as conn:
-        await conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS messages (
-                id SERIAL PRIMARY KEY,
-                title TEXT,
-                content TEXT,
-                tags TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """))
+        await conn.execute(text("CREATE TABLE IF NOT EXISTS messages (id SERIAL PRIMARY KEY, content TEXT NOT NULL)"))
 
-# 1. 获取所有归档
+# 登录接口
+@app.post("/token")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    if form_data.username != USERNAME or not verify_password(form_data.password, HASHED_PASSWORD):
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    access_token = create_access_token(data={"sub": form_data.username})
+    return {"access_token": access_token, "token_type": "bearer"}
+
 @app.get("/api/messages")
 async def get_messages():
     async with AsyncSessionLocal() as session:
         result = await session.execute(text("SELECT * FROM messages ORDER BY id DESC"))
-        rows = result.mappings().all()
-        return [{"id": r['id'], "title": r['title'], "body": r['content'], 
-                 "date": r['created_at'].strftime("%Y-%m-%d"), 
-                 "tags": (r['tags'] or "VIBES").split(",")} for r in rows]
+        return {"items": result.mappings().all()}
 
-# 2. 发布新内容
+# 【受保护接口】只有登录后才能发消息
 @app.post("/api/messages")
-async def create_message(data: dict):
+async def create_message(content: str, current_user: str = Depends(get_current_user)):
     async with AsyncSessionLocal() as session:
-        await session.execute(
-            text("INSERT INTO messages (title, content, tags) VALUES (:title, :content, :tags)"),
-            {"title": data.get('title', 'Untitled'), "content": data.get('body', ''), "tags": data.get('tags', 'VIBES')}
-        )
+        await session.execute(text("INSERT INTO messages (content) VALUES (:content)"), {"content": content})
         await session.commit()
-        return {"success": True}
+        return {"success": True, "author": current_user}
 
-# 3. AI 接口 (Qwen)
-@app.post("/api/ai")
-async def ask_ai(data: dict):
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(
-            "https://api.siliconflow.cn/v1/chat/completions",
-            headers={"Authorization": f"Bearer {AI_API_KEY}"},
-            json={
-                "model": "Qwen/Qwen2.5-7B-Instruct",
-                "messages": [
-                    {"role": "system", "content": "You are a witty, Gen-Z AI assistant for Julian. Mix English and Chinese. Be brief and sharp."},
-                    {"role": "user", "content": data['prompt']}
-                ]
-            }
-        )
-        return response.json()
-
-# 4. 系统监控
-@app.get("/api/stats")
-async def get_stats():
-    return {"cpu": psutil.cpu_percent(), "ram": psutil.virtual_memory().percent}
-
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    return FileResponse("index.html")
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
