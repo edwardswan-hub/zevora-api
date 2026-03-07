@@ -75,14 +75,14 @@ class RegisterRequest(BaseModel):
 
 # --- 工具函数 ---
 def assert_no_merge_markers(paths: list[str]):
-    marker_prefixes = ("<<<<<<< ", "=======", ">>>>>>> ")
+    markers = ("<<<<<<<", "=======", ">>>>>>>")
     for path in paths:
         if not os.path.exists(path):
             continue
         with open(path, "r", encoding="utf-8") as f:
-            for lineno, line in enumerate(f, start=1):
-                if any(line.startswith(prefix) for prefix in marker_prefixes):
-                    raise RuntimeError(f"Merge markers detected in {path}:{lineno}")
+            content = f.read()
+        if any(marker in content for marker in markers):
+            raise RuntimeError(f"Merge markers detected in {path}")
 
 
 def hash_password(password: str) -> str:
