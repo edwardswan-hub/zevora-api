@@ -5,29 +5,370 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zevora 控制台</title>
   <style>
-    :root { --bg:#0f1115; --panel:#171a21; --muted:#8b93a7; --text:#e9ecf3; --line:#2a3040; --accent:#6ba7ff; --ok:#4dd4ac; }
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif}
-    .app{max-width:1100px;margin:0 auto;padding:20px}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg)}
-    .nav{display:flex;gap:10px;flex-wrap:wrap}.nav button{background:#1d2230;color:var(--text);border:1px solid var(--line);padding:8px 12px;cursor:pointer}
-    .nav button.active{border-color:var(--accent);color:var(--accent)}
-    .card{background:var(--panel);border:1px solid var(--line);padding:16px;margin-top:16px}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    h2,h3{margin:0 0 10px 0}.muted{color:var(--muted);font-size:13px}
-    input,textarea{width:100%;background:#111521;border:1px solid var(--line);color:var(--text);padding:9px;margin:6px 0}
-    textarea{min-height:110px;resize:vertical}
-    button{background:var(--accent);border:none;color:#09101f;padding:9px 14px;cursor:pointer;font-weight:600}
-    .btn2{background:#20283a;color:var(--text);border:1px solid var(--line)}
-    .hidden{display:none}
-    .list{max-height:260px;overflow:auto;border:1px solid var(--line);padding:10px;background:#111521}
-    .pill{display:inline-block;padding:2px 8px;border:1px solid var(--line);font-size:12px;margin-right:6px}
+    :root {
+      --bg: #fdfdfc;
+      --fg: #1a1a1a;
+      --fg-muted: #555555;
+      --border: #dcdcdc;
+      --border-heavy: #1a1a1a;
+      --accent: #000000;
+      --bg-alt: #f4f4f0;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-serif: 'Merriweather', Georgia, serif;
+      --radius: 0px; /* Serious = sharp edges */
+    }
 
-    /* 强制登录/注册遮罩 */
-    .auth-mask{position:fixed;inset:0;background:rgba(10,12,16,.94);z-index:99;display:flex;align-items:center;justify-content:center;padding:20px}
-    .auth-box{width:min(460px,100%);background:var(--panel);border:1px solid var(--line);padding:18px}
-    .tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{flex:1}
+    [data-theme="dark"] {
+      --bg: #121212;
+      --fg: #e4e4e4;
+      --fg-muted: #a0a0a0;
+      --border: #333333;
+      --border-heavy: #e4e4e4;
+      --accent: #ffffff;
+      --bg-alt: #1a1a1a;
+    }
 
-    @media (max-width:900px){.grid,.grid3{grid-template-columns:1fr}}
+    * { box-sizing: border-box; }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      line-height: 1.7;
+      font-size: 15px;
+      transition: background-color 0.3s, color 0.3s;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-serif);
+      color: var(--fg);
+      margin-top: 0;
+      font-weight: 700;
+    }
+
+    a {
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    a:hover { border-bottom-color: var(--fg); }
+
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* TOP BAR - Academic Header */
+    .topbar {
+      border-bottom: 2px solid var(--border-heavy);
+      padding: 30px 0 15px;
+      margin-bottom: 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .brand {
+      font-family: var(--font-serif);
+    }
+    .brand h1 {
+      font-size: 1.8rem;
+      margin: 0 0 4px 0;
+      letter-spacing: -0.5px;
+    }
+    .brand span {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fg-muted);
+    }
+
+    .nav-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 16px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .nav-links a { border: none; font-weight: 500; color: var(--fg-muted); }
+    .nav-links a:hover { color: var(--fg); }
+
+    .theme-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .theme-btn:hover { background: var(--bg-alt); }
+
+    /* SECTION STYLES */
+    .section {
+      margin-bottom: 60px;
+    }
+    .section-header {
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      padding-bottom: 8px;
+    }
+    .section-header h2 {
+      font-size: 1.4rem;
+      margin: 0;
+    }
+    .section-desc {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--fg-muted);
+      font-size: 0.95rem;
+      margin-bottom: 30px;
+    }
+
+    /* GRID & CARDS */
+    .grid {
+      display: grid;
+      gap: 24px;
+    }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+
+    .card {
+      border: 1px solid var(--border);
+      padding: 24px;
+      background: var(--bg);
+    }
+    .card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+    .card p {
+      color: var(--fg-muted);
+      font-size: 0.9rem;
+      margin: 0 0 16px 0;
+    }
+    
+    .meta-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      color: var(--fg-muted);
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+    /* HERO PROFILE (Abstracted) */
+    .abstract {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--border-heavy);
+      padding: 24px 32px;
+      background: var(--bg-alt);
+      margin-bottom: 60px;
+    }
+    .abstract p { margin: 0 0 12px 0; }
+    .abstract p:last-child { margin: 0; }
+    
+    .status-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      font-size: 0.85rem;
+    }
+    .status-table th, .status-table td {
+      border-top: 1px solid var(--border);
+      padding: 8px 0;
+      text-align: left;
+    }
+    .status-table th { color: var(--fg-muted); font-weight: 500; width: 30%; }
+
+    /* JOURNAL */
+    .journal-entry {
+      margin-bottom: 32px;
+    }
+    .journal-entry h3 {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    .journal-entry .meta {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      color: var(--fg-muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: block;
+    }
+    .journal-entry p { margin: 0; color: var(--fg); }
+
+    /* MUSIC LIST (Index format) */
+    .music-list {
+      list-style: none;
+      padding: 0; margin: 0;
+      border-top: 1px solid var(--border);
+    }
+    .music-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .music-list .track { font-weight: 500; }
+    .music-list .artist { color: var(--fg-muted); font-size: 0.85rem; font-family: var(--font-serif); font-style: italic; }
+
+    /* LAB / WIDGETS */
+    .lab-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 24px;
+    }
+
+    .dict-entry .word { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; margin-bottom: 4px; }
+    .dict-entry .pronunciation { font-family: var(--font-sans); color: var(--fg-muted); margin-bottom: 16px; font-size: 0.9rem; }
+    .dict-entry .definition { font-size: 0.95rem; margin-bottom: 12px; }
+    .dict-entry .example { font-family: var(--font-serif); font-style: italic; color: var(--fg-muted); font-size: 0.9rem; border-left: 2px solid var(--border); padding-left: 12px;}
+
+    .timer-display {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 20px 0;
+      letter-spacing: -1px;
+    }
+
+    /* MARKDOWN EDITOR */
+    .md-editor-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid var(--border);
+      min-height: 250px;
+    }
+    .md-pane {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .md-pane-header {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fg-muted);
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+    .md-editor-container textarea {
+      width: 100%;
+      flex: 1;
+      border: none;
+      background: transparent;
+      resize: none;
+      color: var(--fg);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .md-preview {
+      border-left: 1px solid var(--border);
+      background: var(--bg-alt);
+      font-size: 0.9rem;
+      overflow-y: auto;
+    }
+    .md-preview p { margin-top: 0; }
+    .md-preview h1, .md-preview h2, .md-preview h3 { font-size: 1.1em; margin-top: 0; }
+    .md-preview pre { background: var(--bg); padding: 8px; border: 1px solid var(--border); overflow-x: auto; font-size: 0.8em; }
+    .md-preview code { font-family: 'Courier New', Courier, monospace; background: var(--bg); padding: 2px 4px; }
+    
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    button.solid {
+      background: var(--fg);
+      color: var(--bg);
+      border: 1px solid var(--fg);
+      padding: 6px 16px;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+    button.solid:hover { opacity: 0.8; }
+    button.outline {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    button.outline:hover { background: var(--bg-alt); }
+
+
+    .panel {
+      border: 1px solid var(--border);
+      padding: 18px;
+      margin-bottom: 18px;
+      background: var(--bg);
+    }
+    .panel h3 { margin: 0 0 12px 0; font-size: 1rem; }
+    .input, .textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--fg);
+      padding: 8px;
+      font-family: var(--font-sans);
+      margin-bottom: 10px;
+    }
+    .textarea { min-height: 88px; resize: vertical; }
+    .small { font-size: 0.8rem; color: var(--fg-muted); }
+    .mono { font-family: 'Courier New', Courier, monospace; }
+
+    /* FOOTER */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding-top: 30px;
+      margin-top: 60px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--fg-muted);
+      font-family: var(--font-serif);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .topbar { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .nav-controls { align-items: flex-start; }
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .lab-grid { grid-template-columns: 1fr; }
+      .md-editor-container { grid-template-columns: 1fr; }
+      .md-preview { border-left: none; border-top: 1px solid var(--border); }
+    }
   </style>
 </head>
 <body>
@@ -39,10 +380,15 @@
         <button id="tabLogin">登录</button>
         <button id="tabRegister" class="btn2">注册</button>
       </div>
-      <div id="loginPane">
-        <input id="loginUser" placeholder="用户名" />
-        <input id="loginPass" type="password" placeholder="密码" />
-        <button id="loginBtn">登录</button>
+      <div class="nav-controls">
+        <button class="theme-btn" id="themeBtn">Dark Mode</button>
+        <nav class="nav-links">
+          <a href="#abstract">Abstract</a>
+          <a href="#projects">Research/Projects</a>
+          <a href="#journal">Journal</a>
+          <a href="#lab">Lab</a>
+          <a href="#access">Access</a>
+        </nav>
       </div>
       <div id="registerPane" class="hidden">
         <input id="regUser" placeholder="新用户名（不能是 Julian）" />
@@ -118,6 +464,64 @@
         </div>
       </div>
     </section>
+
+
+    <section id="access" class="section">
+      <div class="section-header">
+        <h2>Access & AI Console</h2>
+      </div>
+      <div class="grid grid-2">
+        <div>
+          <div class="panel">
+            <h3>AI Assistant</h3>
+            <textarea id="aiPrompt" class="textarea" placeholder="输入你的问题，例如：帮我规划今天的学习流程"></textarea>
+            <div class="btn-group" style="margin-top:0;">
+              <button class="solid" id="askAiBtn">Ask AI</button>
+            </div>
+            <p id="aiReply" class="small" style="margin-top:12px; white-space: pre-wrap;">AI response will appear here.</p>
+          </div>
+
+          <div class="panel">
+            <h3>留言板（支持访客策略）</h3>
+            <textarea id="messageInput" class="textarea" placeholder="写下一条留言..."></textarea>
+            <button class="solid" id="sendMessageBtn">Send Message</button>
+            <div id="messageStatus" class="small" style="margin-top:8px;"></div>
+            <div id="messageList" class="small" style="margin-top:12px;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <h3>登录通道（Admin / Visitor）</h3>
+            <input id="loginUsername" class="input" placeholder="username" />
+            <input id="loginPassword" class="input" type="password" placeholder="password" />
+            <button class="solid" id="loginBtn">Login</button>
+            <p id="authInfo" class="small" style="margin-top:8px;">未登录</p>
+          </div>
+
+          <div class="panel" id="adminPanel" style="display:none;">
+            <h3>Admin Channel</h3>
+            <label class="small"><input type="checkbox" id="allowGuestAiChk" /> Allow guest AI</label><br/>
+            <label class="small"><input type="checkbox" id="allowGuestMsgChk" /> Allow guest messages</label>
+            <div class="btn-group">
+              <button class="outline" id="saveSettingsBtn">Save Settings</button>
+            </div>
+            <hr style="border:none; border-top:1px solid var(--border); margin:14px 0;">
+            <input id="newVisitorName" class="input" placeholder="new visitor username" />
+            <button class="solid" id="createVisitorBtn">Create Visitor</button>
+            <p id="visitorCreated" class="small mono" style="margin-top:8px;"></p>
+            <div id="visitorList" class="small" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div>© <span id="year"></span> Julian. Strict layout.</div>
+      <div>In Omnia Paratus.</div>
+    </footer>
+
   </div>
 
   <script>
@@ -260,17 +664,154 @@
       tabRegister.classList.remove('btn2'); tabLogin.classList.add('btn2');
     });
 
-    document.getElementById('loginBtn').addEventListener('click', doLogin);
-    document.getElementById('registerBtn').addEventListener('click', doRegister);
-    document.getElementById('askAiBtn').addEventListener('click', askAI);
-    document.getElementById('sendMsgBtn').addEventListener('click', sendMessage);
-    document.getElementById('savePolicyBtn').addEventListener('click', savePolicy);
-    document.getElementById('createVisitorBtn').addEventListener('click', createVisitor);
-    document.getElementById('logoutBtn').addEventListener('click', logout);
 
-    renderIdentity();
+    // --- Access/Auth/API helpers ---
+    const API = {
+      token: localStorage.getItem('zevora_token') || '',
+      role: localStorage.getItem('zevora_role') || '',
+      username: localStorage.getItem('zevora_username') || ''
+    };
+
+    function apiHeaders(isJson = true) {
+      const headers = {};
+      if (isJson) headers['Content-Type'] = 'application/json';
+      if (API.token) headers['Authorization'] = `Bearer ${API.token}`;
+      return headers;
+    }
+
+    function updateAuthUI() {
+      const authInfo = document.getElementById('authInfo');
+      if (API.token) {
+        authInfo.textContent = `已登录: ${API.username} (${API.role})`;
+      } else {
+        authInfo.textContent = '未登录';
+      }
+      document.getElementById('adminPanel').style.display = API.role === 'admin' ? 'block' : 'none';
+    }
+
+    async function login() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const body = new URLSearchParams({ username, password });
+      const res = await fetch('/api/token', { method: 'POST', body });
+      if (!res.ok) {
+        document.getElementById('authInfo').textContent = '登录失败';
+        return;
+      }
+      const data = await res.json();
+      API.token = data.access_token;
+      API.role = data.role;
+      API.username = data.username;
+      localStorage.setItem('zevora_token', API.token);
+      localStorage.setItem('zevora_role', API.role);
+      localStorage.setItem('zevora_username', API.username);
+      updateAuthUI();
+      if (API.role === 'admin') await loadAdminOverview();
+      await loadMessages();
+    }
+
+    async function askAI() {
+      const prompt = document.getElementById('aiPrompt').value.trim();
+      if (!prompt) return;
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: apiHeaders(true),
+        body: JSON.stringify({ prompt })
+      });
+      const box = document.getElementById('aiReply');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        box.textContent = `AI request failed: ${err.detail || res.status}`;
+        return;
+      }
+      const data = await res.json();
+      box.textContent = data.reply;
+    }
+
+    async function sendMessage() {
+      const content = document.getElementById('messageInput').value.trim();
+      if (!content) return;
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: apiHeaders(true),
+        body: JSON.stringify({ content })
+      });
+      const status = document.getElementById('messageStatus');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        status.textContent = `发送失败: ${err.detail || res.status}`;
+        return;
+      }
+      status.textContent = '发送成功';
+      document.getElementById('messageInput').value = '';
+      await loadMessages();
+    }
+
+    async function loadMessages() {
+      const res = await fetch('/api/messages');
+      if (!res.ok) return;
+      const data = await res.json();
+      const box = document.getElementById('messageList');
+      box.innerHTML = data.items.slice(0, 8).map(i => `<div>• <strong>${i.author}</strong>: ${i.content}</div>`).join('') || '暂无留言';
+    }
+
+    async function loadAdminOverview() {
+      const res = await fetch('/api/admin/overview', { headers: apiHeaders(false) });
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('allowGuestAiChk').checked = !!data.settings.allow_guest_ai;
+      document.getElementById('allowGuestMsgChk').checked = !!data.settings.allow_guest_messages;
+      await loadVisitors();
+    }
+
+    async function saveSettings() {
+      await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: apiHeaders(true),
+        body: JSON.stringify({
+          allow_guest_ai: document.getElementById('allowGuestAiChk').checked,
+          allow_guest_messages: document.getElementById('allowGuestMsgChk').checked
+        })
+      });
+    }
+
+    async function createVisitor() {
+      const username = document.getElementById('newVisitorName').value.trim();
+      if (!username) return;
+      const res = await fetch('/api/admin/visitors', {
+        method: 'POST',
+        headers: apiHeaders(true),
+        body: JSON.stringify({ username })
+      });
+      const out = document.getElementById('visitorCreated');
+      if (!res.ok) {
+        out.textContent = '创建失败';
+        return;
+      }
+      const data = await res.json();
+      out.textContent = `visitor: ${data.username}  pass: ${data.password}`;
+      await loadVisitors();
+    }
+
+    async function loadVisitors() {
+      const res = await fetch('/api/admin/visitors', { headers: apiHeaders(false) });
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('visitorList').innerHTML = data.items.map(i => `• ${i.username} (${i.enabled ? 'enabled' : 'disabled'})`).join('<br/>') || '暂无访客账号';
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('askAiBtn').addEventListener('click', askAI);
+    document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+    document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+    document.getElementById('createVisitorBtn').addEventListener('click', createVisitor);
+
+    updateAuthUI();
     loadMessages();
-    if (API.token) { authMask.classList.add('hidden'); loadPolicy(); loadVisitors(); }
+    if (API.role === 'admin') loadAdminOverview();
+
+    // --- Footer Year ---
+    document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>

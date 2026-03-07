@@ -25,14 +25,12 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./zevora.db")
 
-# 用户指定管理员账号
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "Julian")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "15884417321aa")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "123456")
 
-# 用户指定 SiliconFlow 参数（仍支持环境变量覆盖）
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "sk-umjtlylioalvwivtwmfuewigndyxgdyrullstjuytotprbfj")
-OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.siliconflow.cn/v1")
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "Qwen/Qwen3-8B")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/token")
@@ -51,6 +49,7 @@ app.add_middleware(
 )
 
 
+# --- 模型 ---
 class SaveRequest(BaseModel):
     filename: str
     content: str
@@ -62,12 +61,6 @@ class AIRequest(BaseModel):
 
 class VisitorCreateRequest(BaseModel):
     username: str
-    password: Optional[str] = None
-
-
-class RegisterRequest(BaseModel):
-    username: str
-    password: str
 
 
 class SiteSettingsUpdateRequest(BaseModel):
@@ -75,6 +68,7 @@ class SiteSettingsUpdateRequest(BaseModel):
     allow_guest_messages: Optional[bool] = None
 
 
+# --- 工具函数 ---
 def hash_password(password: str) -> str:
     safe_password = password[:72] if len(password) > 72 else password
     return pwd_context.hash(safe_password)
@@ -98,18 +92,6 @@ def create_access_token(data: dict):
 def random_password(length: int = 12) -> str:
     alphabet = string.ascii_letters + string.digits
     return "".join(secrets.choice(alphabet) for _ in range(length))
-
-
-def assert_no_merge_markers(file_paths: list[str]) -> None:
-    markers = ("<<<<<<<", "=======", ">>>>>>>")
-    for file_path in file_paths:
-        if not os.path.exists(file_path):
-            continue
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
-        if any(marker in content for marker in markers):
-            raise RuntimeError(f"Merge conflict marker detected in {file_path}")
-
 
 
 async def get_site_settings(session: AsyncSession) -> dict:
@@ -158,6 +140,7 @@ def require_admin(current_user: dict = Depends(get_current_user)):
     return current_user
 
 
+# --- 初始化 ---
 @app.on_event("startup")
 async def startup():
     assert_no_merge_markers(["main.py", "index.html"])
@@ -170,9 +153,7 @@ async def startup():
                     username TEXT UNIQUE NOT NULL,
                     hashed_password TEXT NOT NULL,
                     role TEXT NOT NULL,
-                    enabled INTEGER NOT NULL DEFAULT 1,
-                    source TEXT NOT NULL DEFAULT 'self',
-                    created_at TEXT NOT NULL DEFAULT ''
+                    enabled INTEGER NOT NULL DEFAULT 1
                 )
                 """
             )
@@ -200,28 +181,11 @@ async def startup():
             )
         )
 
-        # 兼容老表结构
-        try:
-            await conn.execute(text("ALTER TABLE users ADD COLUMN source TEXT NOT NULL DEFAULT 'self'"))
-        except Exception:
-            pass
-        try:
-            await conn.execute(text("ALTER TABLE users ADD COLUMN created_at TEXT NOT NULL DEFAULT ''"))
-        except Exception:
-            pass
-
     async with AsyncSessionLocal() as session:
         existing_admin = await session.execute(text("SELECT id FROM users WHERE username=:username"), {"username": ADMIN_USERNAME})
         if not existing_admin.fetchone():
             await session.execute(
-                text("INSERT INTO users (username, hashed_password, role, enabled, source, created_at) VALUES (:u, :p, 'admin', 1, 'system', :c)"),
-                {"u": ADMIN_USERNAME, "p": hash_password(ADMIN_PASSWORD), "c": datetime.utcnow().isoformat()},
-            )
-            await session.commit()
-        else:
-            # 确保管理员密码符合用户当前要求
-            await session.execute(
-                text("UPDATE users SET hashed_password=:p, role='admin', enabled=1 WHERE username=:u"),
+                text("INSERT INTO users (username, hashed_password, role, enabled) VALUES (:u, :p, 'admin', 1)"),
                 {"u": ADMIN_USERNAME, "p": hash_password(ADMIN_PASSWORD)},
             )
             await session.commit()
@@ -229,6 +193,7 @@ async def startup():
         await get_site_settings(session)
 
 
+# --- 认证 ---
 @app.post("/api/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     async with AsyncSessionLocal() as session:
@@ -248,29 +213,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": token, "token_type": "bearer", "role": role, "username": username}
 
 
-@app.post("/api/register")
-async def register(data: RegisterRequest):
-    username = data.username.strip()
-    if len(username) < 3 or len(data.password) < 6:
-        raise HTTPException(status_code=400, detail="Username min 3 chars, password min 6 chars")
-
-    if username.lower() == ADMIN_USERNAME.lower():
-        raise HTTPException(status_code=400, detail="Cannot register as admin username")
-
-    async with AsyncSessionLocal() as session:
-        exists = await session.execute(text("SELECT id FROM users WHERE username=:u"), {"u": username})
-        if exists.fetchone():
-            raise HTTPException(status_code=400, detail="Username already exists")
-
-        await session.execute(
-            text("INSERT INTO users (username, hashed_password, role, enabled, source, created_at) VALUES (:u, :p, 'visitor', 1, 'self', :c)"),
-            {"u": username, "p": hash_password(data.password), "c": datetime.utcnow().isoformat()},
-        )
-        await session.commit()
-
-    return {"success": True, "username": username, "role": "visitor"}
-
-
+# --- 留言系统 ---
 @app.get("/api/messages")
 async def get_messages():
     async with AsyncSessionLocal() as session:
@@ -295,6 +238,7 @@ async def create_message(content: str = Body(..., embed=True), current_user: Opt
         return {"success": True}
 
 
+# --- AI 聊天接口 ---
 @app.post("/api/ai/chat")
 async def ai_chat(req: AIRequest, current_user: Optional[dict] = Depends(get_optional_user)):
     async with AsyncSessionLocal() as session:
@@ -327,18 +271,17 @@ async def ai_chat(req: AIRequest, current_user: Optional[dict] = Depends(get_opt
     return {"reply": content}
 
 
+# --- Admin 通道 ---
 @app.get("/api/admin/overview")
 async def admin_overview(current_user: dict = Depends(require_admin)):
     async with AsyncSessionLocal() as session:
         user_count = (await session.execute(text("SELECT COUNT(*) FROM users"))).scalar()
-        visitor_count = (await session.execute(text("SELECT COUNT(*) FROM users WHERE role='visitor'"))).scalar()
         msg_count = (await session.execute(text("SELECT COUNT(*) FROM messages"))).scalar()
         settings = await get_site_settings(session)
 
     return {
         "admin": current_user["username"],
         "users": user_count,
-        "visitors": visitor_count,
         "messages": msg_count,
         "settings": settings,
     }
@@ -346,39 +289,27 @@ async def admin_overview(current_user: dict = Depends(require_admin)):
 
 @app.post("/api/admin/visitors")
 async def create_visitor(data: VisitorCreateRequest, current_user: dict = Depends(require_admin)):
-    username = data.username.strip()
-    if username.lower() == ADMIN_USERNAME.lower():
-        raise HTTPException(status_code=400, detail="Cannot create visitor with admin username")
-
-    password = data.password.strip() if data.password else random_password()
-    if len(password) < 6:
-        raise HTTPException(status_code=400, detail="Password min 6 chars")
+    password = random_password()
 
     async with AsyncSessionLocal() as session:
-        exists = await session.execute(text("SELECT id FROM users WHERE username=:u"), {"u": username})
+        exists = await session.execute(text("SELECT id FROM users WHERE username=:u"), {"u": data.username})
         if exists.fetchone():
             raise HTTPException(status_code=400, detail="Username already exists")
 
         await session.execute(
-            text("INSERT INTO users (username, hashed_password, role, enabled, source, created_at) VALUES (:u, :p, 'visitor', 1, 'invited', :c)"),
-            {"u": username, "p": hash_password(password), "c": datetime.utcnow().isoformat()},
+            text("INSERT INTO users (username, hashed_password, role, enabled) VALUES (:u, :p, 'visitor', 1)"),
+            {"u": data.username, "p": hash_password(password)},
         )
         await session.commit()
 
-    return {
-        "username": username,
-        "password": password,
-        "role": "visitor",
-        "source": "invited",
-        "created_by": current_user["username"],
-    }
+    return {"username": data.username, "password": password, "role": "visitor", "created_by": current_user["username"]}
 
 
 @app.get("/api/admin/visitors")
 async def list_visitors(current_user: dict = Depends(require_admin)):
     async with AsyncSessionLocal() as session:
         result = await session.execute(
-            text("SELECT username, role, enabled, source, created_at FROM users WHERE role='visitor' ORDER BY created_at DESC, username")
+            text("SELECT username, role, enabled FROM users WHERE role='visitor' ORDER BY username")
         )
         items = [dict(row._mapping) for row in result]
     return {"items": items}
@@ -403,6 +334,7 @@ async def update_settings(data: SiteSettingsUpdateRequest, current_user: dict = 
     return {"success": True, "settings": settings}
 
 
+# --- 旧功能兼容：运维/编辑器 ---
 @app.get("/api/sys/stats")
 async def get_sys_stats(current_user: dict = Depends(require_admin)):
     return {
