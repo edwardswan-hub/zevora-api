@@ -6,420 +6,330 @@
   <title>Julian — In Omnia Paratus</title>
   <meta name="description" content="Julian's personal blog — study, AI, chemistry, music, and life." />
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap');
+
     :root {
-      --bg: #07090d;
-      --bg-soft: #0d1118;
-      --card: rgba(255,255,255,0.06);
-      --card-2: rgba(255,255,255,0.04);
-      --text: #f2f5ff;
-      --muted: #9aa4b2;
-      --line: rgba(255,255,255,0.12);
-      --accent: #5ea0ff; /* blue 😌 */
-      --accent-2: #9fd0ff;
-      --danger: #ff6b6b;
-      --shadow: 0 10px 40px rgba(0,0,0,.35);
-      --radius: 20px;
-      --blur: 14px;
+      --bg: #050505;
+      --bg-card: #0e0e0e;
+      --text: #f0f0f0;
+      --muted: #888888;
+      --border: #222222;
+      --accent: #2563eb; /* Classic blue */
+      --accent-hover: #3b82f6;
+      --danger: #ef4444;
+      --radius: 12px;
     }
 
     [data-theme="light"] {
-      --bg: #f7f9fd;
-      --bg-soft: #eef3fb;
-      --card: rgba(255,255,255,0.8);
-      --card-2: rgba(255,255,255,0.6);
-      --text: #101522;
-      --muted: #5c6675;
-      --line: rgba(16,21,34,0.1);
-      --accent: #2f6bff;
-      --accent-2: #76b2ff;
-      --shadow: 0 10px 35px rgba(28,42,69,.12);
+      --bg: #fafafa;
+      --bg-card: #ffffff;
+      --text: #111111;
+      --muted: #666666;
+      --border: #e5e5e5;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
     }
 
     * { box-sizing: border-box; }
+    
     html, body {
       margin: 0;
       padding: 0;
-      background:
-        radial-gradient(900px 500px at 15% -10%, rgba(94,160,255,.18), transparent 65%),
-        radial-gradient(900px 700px at 100% 0%, rgba(125,102,255,.12), transparent 60%),
-        radial-gradient(700px 500px at 50% 120%, rgba(0,221,255,.08), transparent 60%),
-        var(--bg);
+      background-color: var(--bg);
       color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       scroll-behavior: smooth;
+      line-height: 1.6;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    a { color: inherit; text-decoration: none; }
+    a { color: inherit; text-decoration: none; transition: color 0.2s; }
+    a:hover { color: var(--accent); }
     img { max-width: 100%; display: block; }
 
     .container {
-      width: min(1200px, calc(100vw - 28px));
+      width: min(1000px, calc(100vw - 40px));
       margin: 0 auto;
-    }
-
-    .glass {
-      background: linear-gradient(180deg, var(--card), var(--card-2));
-      border: 1px solid var(--line);
-      backdrop-filter: blur(var(--blur));
-      -webkit-backdrop-filter: blur(var(--blur));
-      box-shadow: var(--shadow);
-      border-radius: var(--radius);
+      padding-bottom: 60px;
     }
 
     /* Top nav */
     .topbar {
       position: sticky;
-      top: 12px;
+      top: 0;
       z-index: 20;
-      margin: 12px auto 0;
-      padding: 10px 14px;
+      padding: 20px 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
     }
+    
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      letter-spacing: .2px;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      font-size: 1.1rem;
     }
     .brand-dot {
       width: 10px;
       height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 0 18px rgba(94,160,255,.7);
-      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--accent);
     }
     .brand-sub {
       color: var(--muted);
-      font-weight: 500;
-      font-size: 12px;
-      margin-left: 6px;
+      font-weight: 400;
+      font-size: 0.85rem;
     }
 
     .nav-links {
       display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+      gap: 24px;
     }
     .nav-links a {
-      padding: 8px 12px;
-      border-radius: 999px;
       color: var(--muted);
-      border: 1px solid transparent;
-      font-size: 13px;
-      transition: .2s ease;
+      font-size: 0.9rem;
+      font-weight: 500;
     }
     .nav-links a:hover {
       color: var(--text);
-      border-color: var(--line);
-      background: rgba(255,255,255,.03);
     }
 
-    .icon-btn {
-      border: 1px solid var(--line);
-      background: transparent;
-      color: var(--text);
-      border-radius: 999px;
-      width: 38px;
-      height: 38px;
-      display: inline-grid;
-      place-items: center;
-      cursor: pointer;
-      transition: .2s ease;
-    }
-    .icon-btn:hover {
-      transform: translateY(-1px);
-      border-color: rgba(255,255,255,.22);
-      background: rgba(255,255,255,.03);
-    }
     .actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 12px;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: color 0.2s;
+      padding: 4px;
+    }
+    .icon-btn:hover {
+      color: var(--text);
     }
 
     /* Hero */
     .hero {
-      margin-top: 14px;
-      padding: 22px;
-      overflow: hidden;
-      position: relative;
-    }
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: -1px;
-      border-radius: inherit;
-      pointer-events: none;
-      background: linear-gradient(120deg, rgba(94,160,255,.18), transparent 28%, transparent 72%, rgba(159,208,255,.12));
-      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      mask-composite: exclude;
-      -webkit-mask-composite: xor;
-      padding: 1px;
-    }
-
-    .hero-grid {
+      margin: 60px 0;
       display: grid;
-      grid-template-columns: 1.35fr .9fr;
-      gap: 16px;
-    }
-
-    .badge-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-    .badge {
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.03);
-      color: var(--muted);
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
+      grid-template-columns: 1fr 300px;
+      gap: 60px;
+      align-items: center;
     }
 
     .title {
-      font-size: clamp(28px, 4.8vw, 58px);
-      line-height: .95;
+      font-size: clamp(3rem, 6vw, 5rem);
+      line-height: 1;
       font-weight: 800;
-      letter-spacing: -1.2px;
-      margin: 0;
+      letter-spacing: -2px;
+      margin: 0 0 20px 0;
     }
-
-    .title .gradient {
-      background: linear-gradient(135deg, var(--text) 10%, var(--accent-2) 65%, var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+    .title span {
+      color: var(--accent);
     }
 
     .subtitle {
-      margin-top: 10px;
       color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-      max-width: 58ch;
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin-bottom: 30px;
     }
 
     .typing-line {
-      margin-top: 12px;
+      font-family: 'Inter', monospace;
       color: var(--text);
-      font-weight: 600;
-      font-size: 14px;
-      min-height: 22px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      min-height: 24px;
+      margin-bottom: 40px;
+      padding-left: 16px;
+      border-left: 2px solid var(--accent);
     }
 
     .hero-cta {
-      margin-top: 14px;
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      gap: 16px;
     }
     .btn {
-      border: 1px solid var(--line);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       color: var(--text);
-      background: rgba(255,255,255,.03);
-      padding: 10px 14px;
-      border-radius: 12px;
+      padding: 10px 20px;
+      border-radius: 8px;
       cursor: pointer;
-      font-weight: 600;
-      transition: .2s ease;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
     }
-    .btn:hover { transform: translateY(-1px); }
+    .btn:hover { 
+      border-color: var(--muted); 
+    }
     .btn.primary {
-      border-color: rgba(94,160,255,.4);
-      background: linear-gradient(135deg, rgba(94,160,255,.16), rgba(94,160,255,.05));
-      box-shadow: 0 0 0 1px rgba(94,160,255,.12) inset;
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+    .btn.primary:hover {
+      background: var(--muted);
+      border-color: var(--muted);
     }
 
-    /* Side mini profile */
+    /* Profile Side */
     .profile-card {
-      padding: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .avatar {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      margin-bottom: 24px;
+      font-size: 4rem;
+      font-weight: 800;
+      color: var(--border);
+    }
+    .quick-facts {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
-
-    .avatar-wrap {
-      position: relative;
-      padding: 14px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent);
-    }
-    .avatar {
-      aspect-ratio: 1 / 1;
-      border-radius: 16px;
-      background:
-        radial-gradient(circle at 30% 25%, rgba(255,255,255,.12), transparent 35%),
-        radial-gradient(circle at 70% 20%, rgba(94,160,255,.24), transparent 40%),
-        linear-gradient(135deg, #111827, #0b1220 45%, #0b1628);
-      border: 1px solid rgba(255,255,255,.08);
-      display: grid;
-      place-items: center;
-      overflow: hidden;
-      position: relative;
-    }
-    .avatar::before {
-      content: "J";
-      font-size: 80px;
-      font-weight: 900;
-      color: rgba(255,255,255,.92);
-      letter-spacing: -4px;
-      transform: translateY(-4px);
-    }
-    .avatar::after {
-      content: "";
-      position: absolute;
-      inset: auto -10% -8% -10%;
-      height: 42%;
-      background: radial-gradient(closest-side, rgba(94,160,255,.35), transparent 70%);
-      filter: blur(10px);
-    }
-
-    .quick-facts {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
     .fact {
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-      background: rgba(255,255,255,.02);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      border-bottom: 1px dashed var(--border);
+      padding-bottom: 8px;
     }
-    .fact .k {
-      font-size: 11px;
-      color: var(--muted);
-    }
-    .fact .v {
-      margin-top: 4px;
-      font-size: 13px;
-      font-weight: 600;
-    }
+    .fact .k { color: var(--muted); }
+    .fact .v { font-weight: 600; }
 
     /* Layout sections */
     .section {
-      margin-top: 14px;
-      padding: 16px;
+      margin-top: 80px;
     }
     .section h2 {
-      margin: 0;
-      font-size: 16px;
-      letter-spacing: .1px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin: 0 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section h2::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
     }
     .section .desc {
-      margin-top: 4px;
       color: var(--muted);
-      font-size: 13px;
+      font-size: 0.95rem;
+      margin-bottom: 30px;
     }
 
     .grid {
-      margin-top: 12px;
       display: grid;
-      gap: 12px;
+      gap: 20px;
     }
-
-    .grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
-    .grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
 
     .card {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px;
-      background: rgba(255,255,255,.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      background: var(--bg-card);
+      transition: transform 0.2s ease, border-color 0.2s;
+    }
+    .card:hover {
+      border-color: var(--muted);
+      transform: translateY(-2px);
     }
     .card h3 {
-      margin: 0;
-      font-size: 14px;
+      margin: 0 0 12px 0;
+      font-size: 1.1rem;
+      font-weight: 600;
     }
     .card p {
-      margin: 6px 0 0;
+      margin: 0 0 20px 0;
       color: var(--muted);
-      line-height: 1.65;
-      font-size: 13px;
+      font-size: 0.9rem;
     }
     .tag-row {
-      margin-top: 10px;
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: 8px;
     }
     .tag {
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 4px 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* Projects */
-    .project {
-      position: relative;
-      overflow: hidden;
-    }
-    .project::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(500px 180px at 100% -10%, rgba(94,160,255,.12), transparent 65%);
-      pointer-events: none;
-    }
     .project-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 8px;
+      margin-bottom: 16px;
     }
     .status {
-      border-radius: 999px;
-      font-size: 11px;
+      font-size: 0.7rem;
       padding: 4px 8px;
-      border: 1px solid rgba(94,160,255,.35);
-      background: rgba(94,160,255,.1);
-      color: #b8d9ff;
-      white-space: nowrap;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
     /* Journal */
     .journal-item {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 10px;
-      align-items: start;
-      padding: 10px 0;
-      border-bottom: 1px dashed var(--line);
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
     }
+    .journal-item:first-child { padding-top: 0; }
     .journal-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .journal-dot {
-      width: 8px;
-      height: 8px;
-      margin-top: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 12px rgba(94,160,255,.55);
-    }
     .journal-title {
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 1.05rem;
+      font-weight: 600;
     }
     .journal-meta {
-      color: var(--muted);
-      font-size: 11px;
-      margin-top: 2px;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin: 4px 0 12px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .journal-text {
-      margin-top: 6px;
       color: var(--muted);
-      line-height: 1.6;
-      font-size: 13px;
+      font-size: 0.95rem;
     }
 
     /* Music list */
@@ -427,178 +337,135 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
-      border-bottom: 1px dashed var(--line);
-      padding: 10px 0;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
     }
-    .song:last-child { border-bottom: none; padding-bottom: 0; }
+    .song:last-child { border-bottom: none; }
     .song .left {
       display: flex;
       align-items: center;
-      gap: 10px;
-      min-width: 0;
+      gap: 16px;
     }
     .song-num {
-      width: 22px;
-      height: 22px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      background: rgba(255,255,255,.04);
-      border: 1px solid var(--line);
       color: var(--muted);
-      font-size: 11px;
-      flex-shrink: 0;
+      font-family: monospace;
+      font-size: 0.9rem;
     }
-    .song-info { min-width: 0; }
     .song-name {
-      font-size: 13px;
+      font-size: 0.95rem;
       font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
     .song-artist {
-      margin-top: 2px;
-      font-size: 11px;
+      font-size: 0.8rem;
       color: var(--muted);
     }
     .pill {
-      border: 1px solid var(--line);
-      padding: 4px 8px;
-      border-radius: 999px;
+      font-size: 0.75rem;
       color: var(--muted);
-      font-size: 11px;
-      white-space: nowrap;
+      background: var(--bg);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
     }
 
     /* Widgets */
     .widget-grid {
-      margin-top: 12px;
       display: grid;
-      gap: 12px;
-      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 20px;
+      grid-template-columns: 1fr 1fr 1fr;
     }
-
     .word-box .word {
-      font-size: 20px;
+      font-size: 1.8rem;
       font-weight: 800;
-      letter-spacing: .2px;
-      margin-top: 2px;
+      letter-spacing: -1px;
+      margin-top: 8px;
     }
     .word-box .phonetic {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 2px;
+      color: var(--accent);
+      font-family: monospace;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
     }
-    .word-box .meaning {
-      margin-top: 8px;
-      font-size: 13px;
-      color: var(--text);
-    }
+    .word-box .meaning { font-size: 0.95rem; }
     .word-box .example {
-      margin-top: 6px;
+      margin-top: 8px;
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
+      font-size: 0.85rem;
+      font-style: italic;
     }
 
+    .pomodoro { text-align: center; }
     .pomodoro .timer {
-      font-size: 30px;
+      font-size: 3.5rem;
       font-weight: 800;
-      letter-spacing: 1px;
-      margin-top: 6px;
+      letter-spacing: -2px;
+      font-family: monospace;
+      margin: 10px 0;
+      color: var(--text);
     }
     .pomodoro .tiny {
       color: var(--muted);
-      font-size: 12px;
-      margin-top: 4px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
     }
     .pomodoro .row {
-      margin-top: 10px;
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
     }
 
     .note textarea {
       width: 100%;
-      min-height: 110px;
-      background: rgba(255,255,255,.02);
-      border: 1px solid var(--line);
+      min-height: 140px;
+      background: var(--bg);
+      border: 1px solid var(--border);
       color: var(--text);
-      border-radius: 12px;
-      padding: 10px 12px;
+      border-radius: 8px;
+      padding: 12px;
       outline: none;
       resize: vertical;
-      font: inherit;
-      font-size: 13px;
-      line-height: 1.6;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      margin: 12px 0;
+      transition: border-color 0.2s;
     }
-    .note textarea::placeholder { color: var(--muted); }
-    .note .tiny {
-      color: var(--muted);
-      font-size: 11px;
-      margin-top: 8px;
-    }
+    .note textarea:focus { border-color: var(--accent); }
+    .note .tiny { color: var(--muted); font-size: 0.75rem; }
 
     /* Footer */
     .footer {
-      margin: 14px 0 24px;
-      padding: 14px;
+      margin-top: 80px;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    .footer .left {
       color: var(--muted);
-      font-size: 12px;
-      line-height: 1.7;
+      font-size: 0.85rem;
     }
-    .footer .right {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .mono { font-family: monospace; }
 
-    /* tiny helpers */
+    /* utils */
     .muted { color: var(--muted); }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
 
     /* responsive */
-    @media (max-width: 980px) {
-      .hero-grid {
-        grid-template-columns: 1fr;
-      }
-      .grid-3 {
-        grid-template-columns: 1fr;
-      }
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-      .widget-grid {
-        grid-template-columns: 1fr;
-      }
-      .nav-links {
-        display: none;
-      }
-      .topbar {
-        top: 8px;
-      }
+    @media (max-width: 800px) {
+      .hero { grid-template-columns: 1fr; gap: 40px; }
+      .grid-3, .grid-2, .widget-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .profile-card { max-width: 400px; margin: 0 auto; }
     }
 
-    /* smooth entrance */
+    /* Animation */
     .reveal {
       opacity: 0;
-      transform: translateY(8px);
-      animation: reveal .5s ease forwards;
+      transform: translateY(20px);
+      animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    .reveal:nth-child(2) { animation-delay: .04s; }
-    .reveal:nth-child(3) { animation-delay: .08s; }
-    .reveal:nth-child(4) { animation-delay: .12s; }
-    .reveal:nth-child(5) { animation-delay: .16s; }
+    .reveal:nth-child(2) { animation-delay: 0.1s; }
+    .reveal:nth-child(3) { animation-delay: 0.2s; }
+    .reveal:nth-child(4) { animation-delay: 0.3s; }
+    .reveal:nth-child(5) { animation-delay: 0.4s; }
 
     @keyframes reveal {
       to { opacity: 1; transform: translateY(0); }
@@ -608,11 +475,11 @@
 <body>
   <div class="container">
     <!-- NAV -->
-    <header class="topbar glass">
+    <header class="topbar reveal">
       <div class="brand">
         <span class="brand-dot"></span>
-        <span>JULIAN.</span>
-        <span class="brand-sub">In Omnia Paratus</span>
+        JULIAN.
+        <span class="brand-sub">I.O.P.</span>
       </div>
 
       <nav class="nav-links">
@@ -621,419 +488,288 @@
         <a href="#journal">Journal</a>
         <a href="#music">Music</a>
         <a href="#lab">Lab</a>
-        <a href="#contact">Contact</a>
       </nav>
 
       <div class="actions">
-        <button class="icon-btn" id="accentBtn" title="Switch accent">✦</button>
-        <button class="icon-btn" id="themeBtn" title="Toggle theme">☾</button>
+        <button class="icon-btn" id="accentBtn" title="Change Accent Color">✧</button>
+        <button class="icon-btn" id="themeBtn" title="Toggle Theme">☾</button>
       </div>
     </header>
 
     <!-- HERO -->
-    <section class="hero glass reveal">
-      <div class="hero-grid">
-        <div>
-          <div class="badge-row">
-            <span class="badge">Student Mode: ON</span>
-            <span class="badge">AI × Chemistry</span>
-            <span class="badge">CN / EN</span>
-            <span class="badge">Minimalist</span>
-          </div>
+    <section class="hero reveal">
+      <div>
+        <h1 class="title">
+          Hi, I’m <span>Julian</span>.
+        </h1>
 
-          <h1 class="title">
-            Hi, I’m <span class="gradient">Julian</span>.
-          </h1>
-
-          <div class="subtitle">
-            一个在现实里写作业、在脑子里造系统的人。I build things, study hard, overthink everything,
-            and still make time for music and beautiful interfaces.
-          </div>
-
-          <div class="typing-line">
-            <span class="muted">Currently:</span> <span id="typingText"></span><span id="cursor">|</span>
-          </div>
-
-          <div class="hero-cta">
-            <a class="btn primary" href="#projects">See my projects</a>
-            <a class="btn" href="#journal">Read weekly notes</a>
-            <button class="btn" id="scrollLabBtn">Open study lab</button>
-          </div>
+        <div class="subtitle">
+          一个在现实里写作业、在脑子里造系统的人。I build things, study hard, overthink everything, and try to keep it minimal.
         </div>
 
-        <aside class="profile-card glass">
-          <div class="avatar-wrap">
-            <div class="avatar" aria-label="Julian avatar placeholder"></div>
-          </div>
+        <div class="typing-line">
+          <span class="muted">Currently:</span> <span id="typingText"></span><span id="cursor">|</span>
+        </div>
 
-          <div class="quick-facts">
-            <div class="fact">
-              <div class="k">Vibe</div>
-              <div class="v">Sexy Nerd</div>
-            </div>
-            <div class="fact">
-              <div class="k">Color</div>
-              <div class="v">Blue</div>
-            </div>
-            <div class="fact">
-              <div class="k">Focus</div>
-              <div class="v">Deep Work</div>
-            </div>
-            <div class="fact">
-              <div class="k">Fuel</div>
-              <div class="v">Pop Music</div>
-            </div>
-          </div>
-
-          <div class="card" style="padding:12px;">
-            <h3>Personal Motto</h3>
-            <p><span class="mono">In Omnia Paratus</span> — ready for everything, even when life is chaotic.</p>
-          </div>
-        </aside>
+        <div class="hero-cta">
+          <a class="btn primary" href="#projects">View Work</a>
+          <button class="btn" id="scrollLabBtn">Study Lab</button>
+        </div>
       </div>
+
+      <aside class="profile-card">
+        <div class="avatar">J</div>
+        <div class="quick-facts">
+          <div class="fact"><span class="k">Vibe</span><span class="v">Sexy Nerd</span></div>
+          <div class="fact"><span class="k">Status</span><span class="v">Student Mode</span></div>
+          <div class="fact"><span class="k">Focus</span><span class="v">Deep Work</span></div>
+          <div class="fact"><span class="k">Fuel</span><span class="v">Pop Music</span></div>
+        </div>
+      </aside>
     </section>
 
     <!-- ABOUT -->
-    <section id="about" class="section glass reveal">
+    <section id="about" class="section reveal">
       <h2>About me</h2>
-      <div class="desc">一点点自我介绍，但不装。Just enough to know the plot.</div>
+      <div class="desc">一点点自我介绍。Just enough to know the plot.</div>
 
       <div class="grid grid-3">
         <div class="card">
-          <h3>🎓 Student brain, builder hands</h3>
-          <p>
-            我是那种一边被作业追着跑，一边还想把生活做成产品的人。
-            I like structure, systems, and turning messy things into clean workflows.
-          </p>
+          <h3>Student brain</h3>
+          <p>我是那种一边被作业追着跑，一边还想把生活做成产品的人。I like structure and turning messy things into clean workflows.</p>
           <div class="tag-row">
-            <span class="tag">Study routines</span>
-            <span class="tag">Weekly journal</span>
+            <span class="tag">Routines</span>
             <span class="tag">Deep work</span>
           </div>
         </div>
-
         <div class="card">
-          <h3>🤖 AI / Tech obsession</h3>
-          <p>
-            喜欢 AI、前端界面、自动化、multi-agent ideas。I enjoy building things that feel smart,
-            useful, and a little cinematic.
-          </p>
+          <h3>Tech obsession</h3>
+          <p>喜欢 AI、前端界面、自动化。I enjoy building things that feel smart, useful, and brutally simple.</p>
           <div class="tag-row">
             <span class="tag">AI tools</span>
-            <span class="tag">Web dev</span>
-            <span class="tag">UI/UX</span>
+            <span class="tag">Dev</span>
           </div>
         </div>
-
         <div class="card">
-          <h3>🧪 Chemistry + creativity</h3>
-          <p>
-            理科脑 but aesthetic heart. I care about clear logic, but also how things look, feel, and move.
-            Pretty + precise is the goal.
-          </p>
+          <h3>Chem + Design</h3>
+          <p>理科脑 but aesthetic heart. I care about clear logic, but also how things look and feel. Pretty + precise.</p>
           <div class="tag-row">
             <span class="tag">Chemistry</span>
-            <span class="tag">Problem solving</span>
-            <span class="tag">Minimal design</span>
+            <span class="tag">Minimal</span>
           </div>
         </div>
       </div>
     </section>
 
     <!-- PROJECTS -->
-    <section id="projects" class="section glass reveal">
+    <section id="projects" class="section reveal">
       <h2>Projects</h2>
       <div class="desc">Some things I build when I should probably be sleeping.</div>
 
       <div class="grid grid-2">
-        <div class="card project">
+        <div class="card">
           <div class="project-top">
-            <h3>Jarvis — Personal AI Assistant</h3>
-            <span class="status">Core idea</span>
+            <h3>Jarvis / OS</h3>
+            <span class="status">Core</span>
           </div>
-          <p>
-            一个偏“私人操作系统”的助手 concept：study support, reminders, ideas, mood-aware interactions,
-            and clean workflows all in one place.
-          </p>
-          <div class="tag-row">
-            <span class="tag">AI</span>
-            <span class="tag">Assistant</span>
-            <span class="tag">Productivity</span>
-          </div>
+          <p>一个偏“私人操作系统”的助手 concept：study support, reminders, ideas, and clean workflows all in one place.</p>
         </div>
-
-        <div class="card project">
+        <div class="card">
           <div class="project-top">
-            <h3>Deep Work Launcher</h3>
-            <span class="status">Design-heavy</span>
+            <h3>Focus Launcher</h3>
+            <span class="status">Design</span>
           </div>
-          <p>
-            一个 anti-distraction 的 home experience：focus-first UI, quick check-ins, and calm visual language.
-            Less chaos, more output.
-          </p>
-          <div class="tag-row">
-            <span class="tag">Android</span>
-            <span class="tag">Focus</span>
-            <span class="tag">Launcher</span>
-          </div>
+          <p>一个 anti-distraction 的 home experience：focus-first UI, quick check-ins, and calm visual language.</p>
         </div>
-
-        <div class="card project">
+        <div class="card">
           <div class="project-top">
-            <h3>MyMovie / Media Wall</h3>
-            <span class="status">Fun build</span>
+            <h3>MyMedia Wall</h3>
+            <span class="status">Fun</span>
           </div>
-          <p>
-            一个电影/剧集展示与整理页面。Clean cards, smooth motion, and “this looks expensive” vibes.
-            Because yes, aesthetics matter.
-          </p>
-          <div class="tag-row">
-            <span class="tag">Movies</span>
-            <span class="tag">Frontend</span>
-            <span class="tag">UI Motion</span>
-          </div>
+          <p>电影/剧集展示与整理页面。Clean typography, solid grid, and “this looks expensive” vibes.</p>
         </div>
-
-        <div class="card project">
+        <div class="card">
           <div class="project-top">
-            <h3>FluidGlass Experiments</h3>
-            <span class="status">Visual R&D</span>
+            <h3>Brutalist R&D</h3>
+            <span class="status">Visual</span>
           </div>
-          <p>
-            我喜欢做玻璃质感、灯光、模糊、层次这些视觉实验。It’s not “practical” maybe…
-            but it makes interfaces feel alive.
-          </p>
-          <div class="tag-row">
-            <span class="tag">Glassmorphism</span>
-            <span class="tag">Visual design</span>
-            <span class="tag">CSS / WebGL</span>
-          </div>
+          <p>抛弃玻璃拟物风，拥抱极简。Experimenting with pure typography, high contrast, and grid systems.</p>
         </div>
       </div>
     </section>
 
     <!-- JOURNAL + MUSIC -->
-    <section id="journal" class="section glass reveal">
-      <h2>Weekly Journal</h2>
-      <div class="desc">周记风格 but cleaner. Honest notes, small wins, random thoughts.</div>
+    <section id="journal" class="section reveal">
+      <h2>Journal & Music</h2>
+      <div class="desc">Honest notes and the soundtrack that keeps me sane.</div>
 
       <div class="grid grid-2">
-        <div class="card">
+        <div class="card" style="padding: 0 24px;">
           <div class="journal-item">
-            <span class="journal-dot"></span>
-            <div>
-              <div class="journal-title">This week: trying to stay consistent</div>
-              <div class="journal-meta">Focus / Study / Self-management</div>
-              <div class="journal-text">
-                有时候状态会掉线，但我在学着把节奏拉回来。Not chasing perfection anymore — just trying to keep moving.
-              </div>
-            </div>
+            <div class="journal-title">This week: staying consistent</div>
+            <div class="journal-meta">Self-management</div>
+            <div class="journal-text">有时候状态会掉线，但我在学着把节奏拉回来。Not chasing perfection anymore — just trying to keep moving.</div>
           </div>
-
           <div class="journal-item">
-            <span class="journal-dot"></span>
-            <div>
-              <div class="journal-title">Tiny progress is still progress</div>
-              <div class="journal-meta">Math · Chem · English</div>
-              <div class="journal-text">
-                我发现把任务切小真的有用。10分钟开始，反而能做很久。Classic brain trick, but it works.
-              </div>
-            </div>
+            <div class="journal-title">Tiny progress</div>
+            <div class="journal-meta">Study notes</div>
+            <div class="journal-text">把任务切小真的有用。10分钟开始，反而能做很久。Classic brain trick, but it works.</div>
           </div>
-
           <div class="journal-item">
-            <span class="journal-dot"></span>
-            <div>
-              <div class="journal-title">Designing my life like a product</div>
-              <div class="journal-meta">Systems thinking</div>
-              <div class="journal-text">
-                我想把生活做得更可用：提醒、流程、界面、反馈。If life is messy, build a better UI for it.
-              </div>
-            </div>
+            <div class="journal-title">Life as a product</div>
+            <div class="journal-meta">Systems</div>
+            <div class="journal-text">我想把生活做得更可用：提醒、流程、界面。If life is messy, build a better UI for it.</div>
           </div>
         </div>
 
         <div id="music" class="card">
-          <h3>Now Playing (brain fuel)</h3>
-          <p class="muted" style="margin-top:6px;">Pop-heavy. Emotion-heavy. Obviously.</p>
+          <h3>Now Playing</h3>
+          <p style="margin-bottom: 24px;">Pop-heavy. Emotion-heavy. You know the drill.</p>
 
-          <div style="margin-top:8px;">
-            <div class="song">
-              <div class="left">
-                <div class="song-num">1</div>
-                <div class="song-info">
-                  <div class="song-name">Love Story</div>
-                  <div class="song-artist">Taylor Swift</div>
-                </div>
+          <div class="song">
+            <div class="left">
+              <div class="song-num">01</div>
+              <div>
+                <div class="song-name">Love Story</div>
+                <div class="song-artist">Taylor Swift</div>
               </div>
-              <span class="pill">classic</span>
             </div>
-
-            <div class="song">
-              <div class="left">
-                <div class="song-num">2</div>
-                <div class="song-info">
-                  <div class="song-name">Birds of a Feather</div>
-                  <div class="song-artist">Billie Eilish</div>
-                </div>
+            <span class="pill">classic</span>
+          </div>
+          <div class="song">
+            <div class="left">
+              <div class="song-num">02</div>
+              <div>
+                <div class="song-name">Birds of a Feather</div>
+                <div class="song-artist">Billie Eilish</div>
               </div>
-              <span class="pill">loop</span>
             </div>
-
-            <div class="song">
-              <div class="left">
-                <div class="song-num">3</div>
-                <div class="song-info">
-                  <div class="song-name">I Don’t Wanna Live Forever</div>
-                  <div class="song-artist">ZAYN & Taylor Swift</div>
-                </div>
+            <span class="pill">loop</span>
+          </div>
+          <div class="song">
+            <div class="left">
+              <div class="song-num">03</div>
+              <div>
+                <div class="song-name">I Don’t Wanna Live Forever</div>
+                <div class="song-artist">ZAYN & Taylor Swift</div>
               </div>
-              <span class="pill">night</span>
             </div>
-
-            <div class="song">
-              <div class="left">
-                <div class="song-num">4</div>
-                <div class="song-info">
-                  <div class="song-name">Gracie / Olivia / Ellie mix</div>
-                  <div class="song-artist">Mood rotation</div>
-                </div>
+            <span class="pill">night</span>
+          </div>
+          <div class="song">
+            <div class="left">
+              <div class="song-num">04</div>
+              <div>
+                <div class="song-name">Gracie / Olivia mix</div>
+                <div class="song-artist">Mood rotation</div>
               </div>
-              <span class="pill">daily</span>
             </div>
+            <span class="pill">daily</span>
           </div>
         </div>
       </div>
     </section>
 
     <!-- LAB -->
-    <section id="lab" class="section glass reveal">
+    <section id="lab" class="section reveal">
       <h2>Study Lab</h2>
-      <div class="desc">给你留一个能用的区域，不只是好看。Small tools, real use.</div>
+      <div class="desc">Small tools, real use. Less UI, more focus.</div>
 
       <div class="widget-grid">
         <!-- vocab -->
         <div class="card word-box">
-          <div class="muted" style="font-size:12px;">Word of the Day</div>
+          <div class="muted" style="font-size: 0.8rem; text-transform: uppercase;">Word of the Day</div>
           <div class="word" id="wordText">resilient</div>
           <div class="phonetic" id="wordPhonetic">/rɪˈzɪliənt/</div>
           <div class="meaning" id="wordMeaning">adj. able to recover quickly after difficulties</div>
-          <div class="example" id="wordExample">Example: Even after a messy day, he stayed resilient and got back to work.</div>
-          <div class="row" style="margin-top:10px; display:flex; gap:8px;">
-            <button class="btn" id="newWordBtn">New word</button>
-          </div>
+          <div class="example" id="wordExample">Example: Even after a messy day, he stayed resilient.</div>
+          <button class="btn" id="newWordBtn" style="margin-top: 16px; width: 100%;">Shuffle</button>
         </div>
 
         <!-- pomodoro -->
         <div class="card pomodoro">
-          <div class="muted" style="font-size:12px;">Pomodoro</div>
-          <div class="timer mono" id="timerDisplay">25:00</div>
-          <div class="tiny" id="timerState">Focus session • ready</div>
+          <div class="muted" style="font-size: 0.8rem; text-transform: uppercase;">Timer</div>
+          <div class="timer" id="timerDisplay">25:00</div>
+          <div class="tiny" id="timerState">Focus • ready</div>
           <div class="row">
             <button class="btn primary" id="startTimerBtn">Start</button>
-            <button class="btn" id="resetTimerBtn">Reset</button>
             <button class="btn" id="switchModeBtn">Break</button>
+            <button class="icon-btn" id="resetTimerBtn" style="border:1px solid var(--border); border-radius:8px; width:40px;">↺</button>
           </div>
         </div>
 
         <!-- quick note -->
         <div class="card note">
-          <div class="muted" style="font-size:12px;">Quick dump</div>
-          <textarea id="quickNote" placeholder="Write your thought / task / random panic here..."></textarea>
-          <div style="margin-top:8px; display:flex; gap:8px;">
-            <button class="btn primary" id="saveNoteBtn">Save</button>
+          <div class="muted" style="font-size: 0.8rem; text-transform: uppercase;">Brain Dump</div>
+          <textarea id="quickNote" placeholder="Dump thoughts here..."></textarea>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn primary" id="saveNoteBtn" style="flex:1;">Save</button>
             <button class="btn" id="clearNoteBtn">Clear</button>
           </div>
-          <div class="tiny" id="saveStatus">Saved locally in your browser.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="section glass reveal">
-      <h2>Contact / Links</h2>
-      <div class="desc">还没想好就先占位，later you can replace these with real links.</div>
-
-      <div class="grid grid-3">
-        <div class="card">
-          <h3>Email</h3>
-          <p>you@example.com</p>
-        </div>
-        <div class="card">
-          <h3>GitHub</h3>
-          <p>@yourhandle</p>
-        </div>
-        <div class="card">
-          <h3>Playlist / Social</h3>
-          <p>Apple Music / Spotify / whatever you use</p>
+          <div class="tiny" id="saveStatus" style="margin-top: 8px;">Local storage active.</div>
         </div>
       </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="footer glass reveal">
-      <div class="left">
-        <div>© <span id="year"></span> Julian. Built with taste and a little insomnia.</div>
-        <div class="mono">In Omnia Paratus.</div>
-      </div>
-      <div class="right">
-        <a class="btn" href="#top" onclick="window.scrollTo({top:0, behavior:'smooth'})">Back to top</a>
-      </div>
+    <footer class="footer reveal">
+      <div>© <span id="year"></span> Julian. Minimalist overhaul.</div>
+      <div class="mono">In Omnia Paratus.</div>
     </footer>
   </div>
 
   <script>
-    // ===== Theme =====
+    // Theme toggle
     const html = document.documentElement;
     const themeBtn = document.getElementById('themeBtn');
-    const accentBtn = document.getElementById('accentBtn');
-    const savedTheme = localStorage.getItem('julian_theme');
-    if (savedTheme) html.setAttribute('data-theme', savedTheme);
+    const savedTheme = localStorage.getItem('julian_theme_v2');
+    
+    // Default to dark
+    if (savedTheme === 'light') {
+      html.setAttribute('data-theme', 'light');
+      themeBtn.textContent = '☀';
+    } else {
+      html.removeAttribute('data-theme');
+      themeBtn.textContent = '☾';
+    }
 
     themeBtn.addEventListener('click', () => {
-      const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      if (next === 'dark') html.removeAttribute('data-theme');
-      else html.setAttribute('data-theme', 'light');
-      localStorage.setItem('julian_theme', next);
-      themeBtn.textContent = next === 'light' ? '☀' : '☾';
+      const isLight = html.getAttribute('data-theme') === 'light';
+      if (isLight) {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('julian_theme_v2', 'dark');
+        themeBtn.textContent = '☾';
+      } else {
+        html.setAttribute('data-theme', 'light');
+        localStorage.setItem('julian_theme_v2', 'light');
+        themeBtn.textContent = '☀';
+      }
     });
 
-    // init icon
-    themeBtn.textContent = (html.getAttribute('data-theme') === 'light') ? '☀' : '☾';
-
-    // Accent switch (blue/purple/cyan)
-    const accents = [
-      { a: '#5ea0ff', b: '#9fd0ff' },
-      { a: '#8b7dff', b: '#c8bfff' },
-      { a: '#33cfff', b: '#9df2ff' },
-      { a: '#4fd7a8', b: '#a4ffd8' }
-    ];
-    let accentIndex = Number(localStorage.getItem('julian_accent_idx') || 0);
-
-    function applyAccent(i) {
-      accentIndex = i % accents.length;
-      document.documentElement.style.setProperty('--accent', accents[accentIndex].a);
-      document.documentElement.style.setProperty('--accent-2', accents[accentIndex].b);
-      localStorage.setItem('julian_accent_idx', String(accentIndex));
+    // Accent colors
+    const accents = ['#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c'];
+    let accIdx = Number(localStorage.getItem('julian_acc_v2') || 0);
+    
+    function setAccent(idx) {
+      document.documentElement.style.setProperty('--accent', accents[idx]);
+      localStorage.setItem('julian_acc_v2', idx);
     }
-    applyAccent(accentIndex);
+    setAccent(accIdx);
 
-    accentBtn.addEventListener('click', () => {
-      applyAccent((accentIndex + 1) % accents.length);
+    document.getElementById('accentBtn').addEventListener('click', () => {
+      accIdx = (accIdx + 1) % accents.length;
+      setAccent(accIdx);
     });
 
-    // ===== Typing line =====
+    // Typing effect
     const typingText = document.getElementById('typingText');
     const cursor = document.getElementById('cursor');
-
     const phrases = [
-      'building a cleaner life system',
-      'trying to win against procrastination',
-      'studying chemistry, one concept at a time',
-      'designing things that feel expensive ✨',
-      'learning, failing, fixing, repeating'
+      'designing things that feel expensive.',
+      'studying chemistry, one concept at a time.',
+      'building a cleaner life system.',
+      'winning against procrastination (mostly).'
     ];
-
     let pIndex = 0, cIndex = 0, deleting = false;
 
     function typeLoop() {
@@ -1043,7 +779,7 @@
         typingText.textContent = full.slice(0, cIndex);
         if (cIndex === full.length) {
           deleting = true;
-          setTimeout(typeLoop, 1200);
+          setTimeout(typeLoop, 2000);
           return;
         }
       } else {
@@ -1054,183 +790,109 @@
           pIndex = (pIndex + 1) % phrases.length;
         }
       }
-      setTimeout(typeLoop, deleting ? 35 : 55);
+      setTimeout(typeLoop, deleting ? 30 : 60);
     }
     typeLoop();
 
     setInterval(() => {
       cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
-    }, 450);
+    }, 500);
 
-    // ===== Scroll button =====
+    // Scroll
     document.getElementById('scrollLabBtn').addEventListener('click', () => {
-      document.getElementById('lab').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById('lab').scrollIntoView({ behavior: 'smooth' });
     });
 
-    // ===== Word of the day =====
+    // Word of the Day
     const words = [
-      {
-        word: "resilient",
-        phonetic: "/rɪˈzɪliənt/",
-        meaning: "adj. able to recover quickly after difficulties",
-        example: "Even after a messy day, he stayed resilient and got back to work."
-      },
-      {
-        word: "meticulous",
-        phonetic: "/məˈtɪkjələs/",
-        meaning: "adj. very careful and precise",
-        example: "His notes were meticulous — clean, clear, and impossible to misread."
-      },
-      {
-        word: "coherent",
-        phonetic: "/koʊˈhɪrənt/",
-        meaning: "adj. logical and well organized",
-        example: "The explanation finally felt coherent, so the problem became easy."
-      },
-      {
-        word: "immersive",
-        phonetic: "/ɪˈmɜːrsɪv/",
-        meaning: "adj. seeming to surround you completely",
-        example: "He wants an immersive blog design, not just a plain page."
-      },
-      {
-        word: "tenacious",
-        phonetic: "/təˈneɪʃəs/",
-        meaning: "adj. persistent and unwilling to give up",
-        example: "A tenacious student can be scary in the best way."
-      },
-      {
-        word: "lucid",
-        phonetic: "/ˈluːsɪd/",
-        meaning: "adj. clear and easy to understand",
-        example: "A lucid solution beats a complicated one every time."
-      }
+      { w: "resilient", p: "/rɪˈzɪliənt/", m: "adj. able to recover quickly", e: "Even after a messy day, he stayed resilient." },
+      { w: "meticulous", p: "/məˈtɪkjələs/", m: "adj. very careful and precise", e: "His notes were meticulous and clean." },
+      { w: "coherent", p: "/koʊˈhɪrənt/", m: "adj. logical and well organized", e: "The explanation finally felt coherent." },
+      { w: "lucid", p: "/ˈluːsɪd/", m: "adj. clear and easy to understand", e: "A lucid solution beats a complicated one." }
     ];
-
-    const wordText = document.getElementById('wordText');
-    const wordPhonetic = document.getElementById('wordPhonetic');
-    const wordMeaning = document.getElementById('wordMeaning');
-    const wordExample = document.getElementById('wordExample');
-
-    function renderWord(item) {
-      wordText.textContent = item.word;
-      wordPhonetic.textContent = item.phonetic;
-      wordMeaning.textContent = item.meaning;
-      wordExample.textContent = "Example: " + item.example;
-    }
-
+    
     document.getElementById('newWordBtn').addEventListener('click', () => {
       const item = words[Math.floor(Math.random() * words.length)];
-      renderWord(item);
+      document.getElementById('wordText').textContent = item.w;
+      document.getElementById('wordPhonetic').textContent = item.p;
+      document.getElementById('wordMeaning').textContent = item.m;
+      document.getElementById('wordExample').textContent = "Example: " + item.e;
     });
 
-    // ===== Pomodoro =====
-    const timerDisplay = document.getElementById('timerDisplay');
-    const timerState = document.getElementById('timerState');
-    const startTimerBtn = document.getElementById('startTimerBtn');
-    const resetTimerBtn = document.getElementById('resetTimerBtn');
-    const switchModeBtn = document.getElementById('switchModeBtn');
+    // Pomodoro Timer
+    let isFocus = true, totalSeconds = 25 * 60, ticking = false, timerId = null;
+    const tDisp = document.getElementById('timerDisplay'), tState = document.getElementById('timerState');
+    const btnStart = document.getElementById('startTimerBtn'), btnMode = document.getElementById('switchModeBtn');
 
-    let isFocus = true;
-    let totalSeconds = 25 * 60;
-    let ticking = false;
-    let timerId = null;
-
-    function fmt(n) { return String(n).padStart(2, '0'); }
-    function drawTimer() {
-      const m = Math.floor(totalSeconds / 60);
-      const s = totalSeconds % 60;
-      timerDisplay.textContent = `${fmt(m)}:${fmt(s)}`;
+    function drawTime() {
+      const m = Math.floor(totalSeconds / 60), s = totalSeconds % 60;
+      tDisp.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
 
-    function setMode(focusMode) {
-      isFocus = focusMode;
+    function reset(mode) {
+      isFocus = mode;
       totalSeconds = (isFocus ? 25 : 5) * 60;
-      drawTimer();
-      timerState.textContent = isFocus ? 'Focus session • ready' : 'Break session • ready';
-      switchModeBtn.textContent = isFocus ? 'Break' : 'Focus';
-      startTimerBtn.textContent = 'Start';
       ticking = false;
       clearInterval(timerId);
+      drawTime();
+      btnStart.textContent = 'Start';
+      btnMode.textContent = isFocus ? 'Break' : 'Focus';
+      tState.textContent = isFocus ? 'Focus • ready' : 'Break • ready';
     }
 
-    startTimerBtn.addEventListener('click', () => {
+    btnStart.addEventListener('click', () => {
       if (!ticking) {
         ticking = true;
-        startTimerBtn.textContent = 'Pause';
-        timerState.textContent = isFocus ? 'Focus session • running' : 'Break session • running';
-
+        btnStart.textContent = 'Pause';
+        tState.textContent = isFocus ? 'Focus • running' : 'Break • running';
         timerId = setInterval(() => {
           totalSeconds--;
-          drawTimer();
+          drawTime();
           if (totalSeconds <= 0) {
             clearInterval(timerId);
             ticking = false;
-            startTimerBtn.textContent = 'Start';
-            timerState.textContent = isFocus ? 'Focus done ✅ Take a break.' : 'Break done ✅ Back to work.';
-            // tiny browser beep (best effort)
+            btnStart.textContent = 'Start';
+            tState.textContent = 'Done ✅';
             try {
               const ctx = new (window.AudioContext || window.webkitAudioContext)();
-              const osc = ctx.createOscillator();
-              const gain = ctx.createGain();
+              const osc = ctx.createOscillator(), gain = ctx.createGain();
               osc.connect(gain); gain.connect(ctx.destination);
-              osc.frequency.value = 880;
-              gain.gain.value = 0.03;
-              osc.start();
-              setTimeout(() => { osc.stop(); ctx.close(); }, 180);
-            } catch (e) {}
+              osc.frequency.value = 880; gain.gain.value = 0.05;
+              osc.start(); setTimeout(() => { osc.stop(); ctx.close(); }, 200);
+            } catch(e){}
           }
         }, 1000);
       } else {
         ticking = false;
         clearInterval(timerId);
-        startTimerBtn.textContent = 'Start';
-        timerState.textContent = isFocus ? 'Focus session • paused' : 'Break session • paused';
+        btnStart.textContent = 'Resume';
+        tState.textContent = 'Paused ⏸';
       }
     });
 
-    resetTimerBtn.addEventListener('click', () => {
-      setMode(isFocus);
-    });
+    document.getElementById('resetTimerBtn').addEventListener('click', () => reset(isFocus));
+    btnMode.addEventListener('click', () => reset(!isFocus));
+    drawTime();
 
-    switchModeBtn.addEventListener('click', () => {
-      setMode(!isFocus);
-    });
-
-    drawTimer();
-
-    // ===== Quick Note (localStorage) =====
+    // Notes
     const quickNote = document.getElementById('quickNote');
-    const saveNoteBtn = document.getElementById('saveNoteBtn');
-    const clearNoteBtn = document.getElementById('clearNoteBtn');
     const saveStatus = document.getElementById('saveStatus');
+    quickNote.value = localStorage.getItem('julian_note_v2') || '';
 
-    quickNote.value = localStorage.getItem('julian_quick_note') || '';
-
-    saveNoteBtn.addEventListener('click', () => {
-      localStorage.setItem('julian_quick_note', quickNote.value);
-      saveStatus.textContent = 'Saved ✓ ' + new Date().toLocaleTimeString();
+    document.getElementById('saveNoteBtn').addEventListener('click', () => {
+      localStorage.setItem('julian_note_v2', quickNote.value);
+      saveStatus.textContent = 'Saved ✓';
     });
-
-    clearNoteBtn.addEventListener('click', () => {
+    document.getElementById('clearNoteBtn').addEventListener('click', () => {
       quickNote.value = '';
-      localStorage.removeItem('julian_quick_note');
+      localStorage.removeItem('julian_note_v2');
       saveStatus.textContent = 'Cleared.';
     });
+    quickNote.addEventListener('input', () => saveStatus.textContent = 'Unsaved...');
 
-    // Autosave (soft)
-    let autosaveTimeout = null;
-    quickNote.addEventListener('input', () => {
-      saveStatus.textContent = 'Typing...';
-      clearTimeout(autosaveTimeout);
-      autosaveTimeout = setTimeout(() => {
-        localStorage.setItem('julian_quick_note', quickNote.value);
-        saveStatus.textContent = 'Autosaved ✓';
-      }, 600);
-    });
-
-    // year
+    // Year
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
+
