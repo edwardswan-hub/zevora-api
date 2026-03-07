@@ -100,6 +100,18 @@ def random_password(length: int = 12) -> str:
     return "".join(secrets.choice(alphabet) for _ in range(length))
 
 
+def assert_no_merge_markers(file_paths: list[str]) -> None:
+    markers = ("<<<<<<<", "=======", ">>>>>>>")
+    for file_path in file_paths:
+        if not os.path.exists(file_path):
+            continue
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        if any(marker in content for marker in markers):
+            raise RuntimeError(f"Merge conflict marker detected in {file_path}")
+
+
+
 async def get_site_settings(session: AsyncSession) -> dict:
     result = await session.execute(text("SELECT value FROM site_settings WHERE key='global'"))
     row = result.fetchone()
@@ -148,6 +160,7 @@ def require_admin(current_user: dict = Depends(get_current_user)):
 
 @app.on_event("startup")
 async def startup():
+    assert_no_merge_markers(["main.py", "index.html"])
     async with engine.begin() as conn:
         await conn.execute(
             text(
