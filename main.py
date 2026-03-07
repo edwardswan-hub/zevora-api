@@ -6,8 +6,8 @@ import subprocess
 from datetime import datetime, timedelta
 from typing import Optional
 
-import httpx
-import psutil
+import urllib.error
+import urllib.request
 from fastapi import Body, Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
@@ -302,13 +302,24 @@ async def ai_chat(req: AIRequest, current_user: Optional[dict] = Depends(get_opt
         "temperature": 0.5,
     }
 
-    async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.post(f"{OPENAI_BASE_URL}/chat/completions", headers=headers, json=payload)
+    body = json.dumps(payload).encode("utf-8")
+    request = urllib.request.Request(
+        f"{OPENAI_BASE_URL}/chat/completions",
+        data=body,
+        headers=headers,
+        method="POST",
+    )
 
-    if response.status_code >= 400:
-        raise HTTPException(status_code=502, detail=f"AI upstream error: {response.text}")
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            raw = response.read().decode("utf-8")
+    except urllib.error.HTTPError as exc:
+        error_body = exc.read().decode("utf-8", errors="replace")
+        raise HTTPException(status_code=502, detail=f"AI upstream error: {error_body}")
+    except urllib.error.URLError as exc:
+        raise HTTPException(status_code=502, detail=f"AI upstream unavailable: {exc.reason}")
 
-    data = response.json()
+    data = json.loads(raw)
     content = data["choices"][0]["message"]["content"]
     return {"reply": content}
 
@@ -377,11 +388,30 @@ async def update_settings(data: SiteSettingsUpdateRequest, current_user: dict = 
 
 
 # --- 旧功能兼容：运维/编辑器 ---
+def _memory_used_percent() -> float:
+    total_kb = 0
+    available_kb = 0
+    with open("/proc/meminfo", "r", encoding="utf-8") as f:
+        for line in f:
+            if line.startswith("MemTotal:"):
+                total_kb = int(line.split()[1])
+            elif line.startswith("MemAvailable:"):
+                available_kb = int(line.split()[1])
+            if total_kb and available_kb:
+                break
+
+    if total_kb == 0:
+        return 0.0
+    return round((total_kb - available_kb) * 100 / total_kb, 2)
+
+
 @app.get("/api/sys/stats")
 async def get_sys_stats(current_user: dict = Depends(require_admin)):
+    load1, _, _ = os.getloadavg()
+    cpu_estimate = round((load1 / max(os.cpu_count() or 1, 1)) * 100, 2)
     return {
-        "cpu": psutil.cpu_percent(),
-        "ram": psutil.virtual_memory().percent,
+        "cpu": cpu_estimate,
+        "ram": _memory_used_percent(),
         "uptime": subprocess.getoutput("uptime -p"),
         "docker": subprocess.getoutput("docker ps --format '{{.Names}}: {{.Status}}'"),
     }
