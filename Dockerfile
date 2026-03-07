@@ -11,6 +11,7 @@ RUN pip install --no-cache-dir \
     uvicorn \
     sqlalchemy \
     asyncpg \
+    aiosqlite \
     python-jose[cryptography] \
     passlib[bcrypt] \
     psutil \
