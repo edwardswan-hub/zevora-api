@@ -68,7 +68,23 @@ class SiteSettingsUpdateRequest(BaseModel):
     allow_guest_messages: Optional[bool] = None
 
 
+class RegisterRequest(BaseModel):
+    username: str
+    password: str
+
+
 # --- 工具函数 ---
+def assert_no_merge_markers(paths: list[str]):
+    markers = ("<<<<<<<", "=======", ">>>>>>>")
+    for path in paths:
+        if not os.path.exists(path):
+            continue
+        with open(path, "r", encoding="utf-8") as f:
+            content = f.read()
+        if any(marker in content for marker in markers):
+            raise RuntimeError(f"Merge markers detected in {path}")
+
+
 def hash_password(password: str) -> str:
     safe_password = password[:72] if len(password) > 72 else password
     return pwd_context.hash(safe_password)
@@ -211,6 +227,32 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     token = create_access_token(data={"sub": username, "role": role})
     return {"access_token": token, "token_type": "bearer", "role": role, "username": username}
+
+
+@app.post("/api/register")
+async def register(data: RegisterRequest):
+    username = data.username.strip()
+    password = data.password
+
+    if len(username) < 3:
+        raise HTTPException(status_code=400, detail="Username must be at least 3 characters")
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    if username.lower() == ADMIN_USERNAME.lower():
+        raise HTTPException(status_code=400, detail="Reserved username")
+
+    async with AsyncSessionLocal() as session:
+        exists = await session.execute(text("SELECT id FROM users WHERE username=:u"), {"u": username})
+        if exists.fetchone():
+            raise HTTPException(status_code=400, detail="Username already exists")
+
+        await session.execute(
+            text("INSERT INTO users (username, hashed_password, role, enabled) VALUES (:u, :p, 'visitor', 1)"),
+            {"u": username, "p": hash_password(password)},
+        )
+        await session.commit()
+
+    return {"success": True, "username": username, "role": "visitor"}
 
 
 # --- 留言系统 ---
