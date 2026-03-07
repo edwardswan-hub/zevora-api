@@ -143,6 +143,7 @@ def require_admin(current_user: dict = Depends(get_current_user)):
 # --- 初始化 ---
 @app.on_event("startup")
 async def startup():
+    assert_no_merge_markers(["main.py", "index.html"])
     async with engine.begin() as conn:
         await conn.execute(
             text(
