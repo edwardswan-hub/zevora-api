@@ -337,6 +337,27 @@
     }
     button.outline:hover { background: var(--bg-alt); }
 
+
+    .panel {
+      border: 1px solid var(--border);
+      padding: 18px;
+      margin-bottom: 18px;
+      background: var(--bg);
+    }
+    .panel h3 { margin: 0 0 12px 0; font-size: 1rem; }
+    .input, .textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--fg);
+      padding: 8px;
+      font-family: var(--font-sans);
+      margin-bottom: 10px;
+    }
+    .textarea { min-height: 88px; resize: vertical; }
+    .small { font-size: 0.8rem; color: var(--fg-muted); }
+    .mono { font-family: 'Courier New', Courier, monospace; }
+
     /* FOOTER */
     .footer {
       border-top: 1px solid var(--border);
@@ -377,6 +398,7 @@
           <a href="#projects">Research/Projects</a>
           <a href="#journal">Journal</a>
           <a href="#lab">Lab</a>
+          <a href="#access">Access</a>
         </nav>
       </div>
     </header>
@@ -569,6 +591,57 @@
       </div>
     </section>
 
+
+    <section id="access" class="section">
+      <div class="section-header">
+        <h2>Access & AI Console</h2>
+      </div>
+      <div class="grid grid-2">
+        <div>
+          <div class="panel">
+            <h3>AI Assistant</h3>
+            <textarea id="aiPrompt" class="textarea" placeholder="输入你的问题，例如：帮我规划今天的学习流程"></textarea>
+            <div class="btn-group" style="margin-top:0;">
+              <button class="solid" id="askAiBtn">Ask AI</button>
+            </div>
+            <p id="aiReply" class="small" style="margin-top:12px; white-space: pre-wrap;">AI response will appear here.</p>
+          </div>
+
+          <div class="panel">
+            <h3>留言板（支持访客策略）</h3>
+            <textarea id="messageInput" class="textarea" placeholder="写下一条留言..."></textarea>
+            <button class="solid" id="sendMessageBtn">Send Message</button>
+            <div id="messageStatus" class="small" style="margin-top:8px;"></div>
+            <div id="messageList" class="small" style="margin-top:12px;"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <h3>登录通道（Admin / Visitor）</h3>
+            <input id="loginUsername" class="input" placeholder="username" />
+            <input id="loginPassword" class="input" type="password" placeholder="password" />
+            <button class="solid" id="loginBtn">Login</button>
+            <p id="authInfo" class="small" style="margin-top:8px;">未登录</p>
+          </div>
+
+          <div class="panel" id="adminPanel" style="display:none;">
+            <h3>Admin Channel</h3>
+            <label class="small"><input type="checkbox" id="allowGuestAiChk" /> Allow guest AI</label><br/>
+            <label class="small"><input type="checkbox" id="allowGuestMsgChk" /> Allow guest messages</label>
+            <div class="btn-group">
+              <button class="outline" id="saveSettingsBtn">Save Settings</button>
+            </div>
+            <hr style="border:none; border-top:1px solid var(--border); margin:14px 0;">
+            <input id="newVisitorName" class="input" placeholder="new visitor username" />
+            <button class="solid" id="createVisitorBtn">Create Visitor</button>
+            <p id="visitorCreated" class="small mono" style="margin-top:8px;"></p>
+            <div id="visitorList" class="small" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- FOOTER -->
     <footer class="footer">
       <div>© <span id="year"></span> Julian. Strict layout.</div>
@@ -745,6 +818,152 @@
       localStorage.removeItem('julian_academic_note');
       saveStatus.textContent = 'Cleared.';
     });
+
+
+    // --- Access/Auth/API helpers ---
+    const API = {
+      token: localStorage.getItem('zevora_token') || '',
+      role: localStorage.getItem('zevora_role') || '',
+      username: localStorage.getItem('zevora_username') || ''
+    };
+
+    function apiHeaders(isJson = true) {
+      const headers = {};
+      if (isJson) headers['Content-Type'] = 'application/json';
+      if (API.token) headers['Authorization'] = `Bearer ${API.token}`;
+      return headers;
+    }
+
+    function updateAuthUI() {
+      const authInfo = document.getElementById('authInfo');
+      if (API.token) {
+        authInfo.textContent = `已登录: ${API.username} (${API.role})`;
+      } else {
+        authInfo.textContent = '未登录';
+      }
+      document.getElementById('adminPanel').style.display = API.role === 'admin' ? 'block' : 'none';
+    }
+
+    async function login() {
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const body = new URLSearchParams({ username, password });
+      const res = await fetch('/api/token', { method: 'POST', body });
+      if (!res.ok) {
+        document.getElementById('authInfo').textContent = '登录失败';
+        return;
+      }
+      const data = await res.json();
+      API.token = data.access_token;
+      API.role = data.role;
+      API.username = data.username;
+      localStorage.setItem('zevora_token', API.token);
+      localStorage.setItem('zevora_role', API.role);
+      localStorage.setItem('zevora_username', API.username);
+      updateAuthUI();
+      if (API.role === 'admin') await loadAdminOverview();
+      await loadMessages();
+    }
+
+    async function askAI() {
+      const prompt = document.getElementById('aiPrompt').value.trim();
+      if (!prompt) return;
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: apiHeaders(true),
+        body: JSON.stringify({ prompt })
+      });
+      const box = document.getElementById('aiReply');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        box.textContent = `AI request failed: ${err.detail || res.status}`;
+        return;
+      }
+      const data = await res.json();
+      box.textContent = data.reply;
+    }
+
+    async function sendMessage() {
+      const content = document.getElementById('messageInput').value.trim();
+      if (!content) return;
+      const res = await fetch('/api/messages', {
+        method: 'POST',
+        headers: apiHeaders(true),
+        body: JSON.stringify({ content })
+      });
+      const status = document.getElementById('messageStatus');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        status.textContent = `发送失败: ${err.detail || res.status}`;
+        return;
+      }
+      status.textContent = '发送成功';
+      document.getElementById('messageInput').value = '';
+      await loadMessages();
+    }
+
+    async function loadMessages() {
+      const res = await fetch('/api/messages');
+      if (!res.ok) return;
+      const data = await res.json();
+      const box = document.getElementById('messageList');
+      box.innerHTML = data.items.slice(0, 8).map(i => `<div>• <strong>${i.author}</strong>: ${i.content}</div>`).join('') || '暂无留言';
+    }
+
+    async function loadAdminOverview() {
+      const res = await fetch('/api/admin/overview', { headers: apiHeaders(false) });
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('allowGuestAiChk').checked = !!data.settings.allow_guest_ai;
+      document.getElementById('allowGuestMsgChk').checked = !!data.settings.allow_guest_messages;
+      await loadVisitors();
+    }
+
+    async function saveSettings() {
+      await fetch('/api/admin/settings', {
+        method: 'PATCH',
+        headers: apiHeaders(true),
+        body: JSON.stringify({
+          allow_guest_ai: document.getElementById('allowGuestAiChk').checked,
+          allow_guest_messages: document.getElementById('allowGuestMsgChk').checked
+        })
+      });
+    }
+
+    async function createVisitor() {
+      const username = document.getElementById('newVisitorName').value.trim();
+      if (!username) return;
+      const res = await fetch('/api/admin/visitors', {
+        method: 'POST',
+        headers: apiHeaders(true),
+        body: JSON.stringify({ username })
+      });
+      const out = document.getElementById('visitorCreated');
+      if (!res.ok) {
+        out.textContent = '创建失败';
+        return;
+      }
+      const data = await res.json();
+      out.textContent = `visitor: ${data.username}  pass: ${data.password}`;
+      await loadVisitors();
+    }
+
+    async function loadVisitors() {
+      const res = await fetch('/api/admin/visitors', { headers: apiHeaders(false) });
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('visitorList').innerHTML = data.items.map(i => `• ${i.username} (${i.enabled ? 'enabled' : 'disabled'})`).join('<br/>') || '暂无访客账号';
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('askAiBtn').addEventListener('click', askAI);
+    document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+    document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
+    document.getElementById('createVisitorBtn').addEventListener('click', createVisitor);
+
+    updateAuthUI();
+    loadMessages();
+    if (API.role === 'admin') loadAdminOverview();
 
     // --- Footer Year ---
     document.getElementById('year').textContent = new Date().getFullYear();
