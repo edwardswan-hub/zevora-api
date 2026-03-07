@@ -5,770 +5,610 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Julian — In Omnia Paratus</title>
   <meta name="description" content="Julian's personal blog — study, AI, chemistry, music, and life." />
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap');
+  
+  <!-- Fonts: Merriweather for Serif (Serious), Inter for Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+  
+  <!-- Markdown Parser -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
+  <style>
     :root {
-      --bg: #050505;
-      --bg-card: #0e0e0e;
-      --text: #f0f0f0;
-      --muted: #888888;
-      --border: #222222;
-      --accent: #2563eb; /* Classic blue */
-      --accent-hover: #3b82f6;
-      --danger: #ef4444;
-      --radius: 12px;
+      --bg: #fdfdfc;
+      --fg: #1a1a1a;
+      --fg-muted: #555555;
+      --border: #dcdcdc;
+      --border-heavy: #1a1a1a;
+      --accent: #000000;
+      --bg-alt: #f4f4f0;
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-serif: 'Merriweather', Georgia, serif;
+      --radius: 0px; /* Serious = sharp edges */
     }
 
-    [data-theme="light"] {
-      --bg: #fafafa;
-      --bg-card: #ffffff;
-      --text: #111111;
-      --muted: #666666;
-      --border: #e5e5e5;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
+    [data-theme="dark"] {
+      --bg: #121212;
+      --fg: #e4e4e4;
+      --fg-muted: #a0a0a0;
+      --border: #333333;
+      --border-heavy: #e4e4e4;
+      --accent: #ffffff;
+      --bg-alt: #1a1a1a;
     }
 
     * { box-sizing: border-box; }
     
-    html, body {
+    body {
       margin: 0;
       padding: 0;
       background-color: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      scroll-behavior: smooth;
-      line-height: 1.6;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      color: var(--fg);
+      font-family: var(--font-sans);
+      line-height: 1.7;
+      font-size: 15px;
+      transition: background-color 0.3s, color 0.3s;
+      -webkit-font-smoothing: antialiased;
     }
 
-    a { color: inherit; text-decoration: none; transition: color 0.2s; }
-    a:hover { color: var(--accent); }
-    img { max-width: 100%; display: block; }
+    h1, h2, h3, h4 {
+      font-family: var(--font-serif);
+      color: var(--fg);
+      margin-top: 0;
+      font-weight: 700;
+    }
+
+    a {
+      color: var(--fg);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+    a:hover { border-bottom-color: var(--fg); }
 
     .container {
-      width: min(1000px, calc(100vw - 40px));
+      max-width: 880px;
       margin: 0 auto;
-      padding-bottom: 60px;
+      padding: 0 24px 80px;
     }
 
-    /* Top nav */
+    /* TOP BAR - Academic Header */
     .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      padding: 20px 0;
+      border-bottom: 2px solid var(--border-heavy);
+      padding: 30px 0 15px;
+      margin-bottom: 50px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 40px;
+      align-items: flex-end;
     }
-    
+
     .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
+      font-family: var(--font-serif);
+    }
+    .brand h1 {
+      font-size: 1.8rem;
+      margin: 0 0 4px 0;
       letter-spacing: -0.5px;
-      font-size: 1.1rem;
     }
-    .brand-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent);
+    .brand span {
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fg-muted);
     }
-    .brand-sub {
-      color: var(--muted);
-      font-weight: 400;
-      font-size: 0.85rem;
+
+    .nav-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 12px;
     }
 
     .nav-links {
       display: flex;
-      gap: 24px;
-    }
-    .nav-links a {
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-    .nav-links a:hover {
-      color: var(--text);
-    }
-
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .icon-btn {
-      background: none;
-      border: none;
-      color: var(--muted);
-      font-size: 1.2rem;
-      cursor: pointer;
-      transition: color 0.2s;
-      padding: 4px;
-    }
-    .icon-btn:hover {
-      color: var(--text);
-    }
-
-    /* Hero */
-    .hero {
-      margin: 60px 0;
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 60px;
-      align-items: center;
-    }
-
-    .title {
-      font-size: clamp(3rem, 6vw, 5rem);
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: -2px;
-      margin: 0 0 20px 0;
-    }
-    .title span {
-      color: var(--accent);
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 1.1rem;
-      max-width: 500px;
-      margin-bottom: 30px;
-    }
-
-    .typing-line {
-      font-family: 'Inter', monospace;
-      color: var(--text);
-      font-weight: 500;
-      font-size: 0.95rem;
-      min-height: 24px;
-      margin-bottom: 40px;
-      padding-left: 16px;
-      border-left: 2px solid var(--accent);
-    }
-
-    .hero-cta {
-      display: flex;
       gap: 16px;
-    }
-    .btn {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: all 0.2s ease;
-    }
-    .btn:hover { 
-      border-color: var(--muted); 
-    }
-    .btn.primary {
-      background: var(--text);
-      color: var(--bg);
-      border-color: var(--text);
-    }
-    .btn.primary:hover {
-      background: var(--muted);
-      border-color: var(--muted);
-    }
-
-    /* Profile Side */
-    .profile-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-    }
-    .avatar {
-      width: 100%;
-      aspect-ratio: 1;
-      border-radius: 8px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      display: grid;
-      place-items: center;
-      margin-bottom: 24px;
-      font-size: 4rem;
-      font-weight: 800;
-      color: var(--border);
-    }
-    .quick-facts {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .fact {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       font-size: 0.85rem;
-      border-bottom: 1px dashed var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .nav-links a { border: none; font-weight: 500; color: var(--fg-muted); }
+    .nav-links a:hover { color: var(--fg); }
+
+    .theme-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--fg);
+      font-family: var(--font-sans);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .theme-btn:hover { background: var(--bg-alt); }
+
+    /* SECTION STYLES */
+    .section {
+      margin-bottom: 60px;
+    }
+    .section-header {
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
       padding-bottom: 8px;
     }
-    .fact .k { color: var(--muted); }
-    .fact .v { font-weight: 600; }
-
-    /* Layout sections */
-    .section {
-      margin-top: 80px;
+    .section-header h2 {
+      font-size: 1.4rem;
+      margin: 0;
     }
-    .section h2 {
-      font-size: 1.5rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin: 0 0 8px 0;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .section h2::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
-    .section .desc {
-      color: var(--muted);
+    .section-desc {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--fg-muted);
       font-size: 0.95rem;
       margin-bottom: 30px;
     }
 
+    /* GRID & CARDS */
     .grid {
       display: grid;
-      gap: 20px;
+      gap: 24px;
     }
     .grid-3 { grid-template-columns: repeat(3, 1fr); }
     .grid-2 { grid-template-columns: repeat(2, 1fr); }
 
     .card {
       border: 1px solid var(--border);
-      border-radius: var(--radius);
       padding: 24px;
-      background: var(--bg-card);
-      transition: transform 0.2s ease, border-color 0.2s;
-    }
-    .card:hover {
-      border-color: var(--muted);
-      transform: translateY(-2px);
+      background: var(--bg);
     }
     .card h3 {
-      margin: 0 0 12px 0;
       font-size: 1.1rem;
-      font-weight: 600;
+      margin-bottom: 12px;
     }
     .card p {
-      margin: 0 0 20px 0;
-      color: var(--muted);
+      color: var(--fg-muted);
       font-size: 0.9rem;
+      margin: 0 0 16px 0;
     }
-    .tag-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .tag {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 4px 10px;
-      color: var(--muted);
-      font-size: 0.75rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    /* Projects */
-    .project-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
-    }
-    .status {
+    
+    .meta-tag {
+      display: inline-block;
       font-size: 0.7rem;
-      padding: 4px 8px;
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      border-radius: 4px;
       text-transform: uppercase;
-      font-weight: 600;
       letter-spacing: 0.5px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      padding: 2px 6px;
+      color: var(--fg-muted);
+      margin-right: 6px;
+      margin-bottom: 6px;
     }
 
-    /* Journal */
-    .journal-item {
-      padding: 20px 0;
-      border-bottom: 1px solid var(--border);
+    /* HERO PROFILE (Abstracted) */
+    .abstract {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--border-heavy);
+      padding: 24px 32px;
+      background: var(--bg-alt);
+      margin-bottom: 60px;
     }
-    .journal-item:first-child { padding-top: 0; }
-    .journal-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .journal-title {
-      font-size: 1.05rem;
-      font-weight: 600;
+    .abstract p { margin: 0 0 12px 0; }
+    .abstract p:last-child { margin: 0; }
+    
+    .status-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      font-size: 0.85rem;
     }
-    .journal-meta {
-      color: var(--accent);
+    .status-table th, .status-table td {
+      border-top: 1px solid var(--border);
+      padding: 8px 0;
+      text-align: left;
+    }
+    .status-table th { color: var(--fg-muted); font-weight: 500; width: 30%; }
+
+    /* JOURNAL */
+    .journal-entry {
+      margin-bottom: 32px;
+    }
+    .journal-entry h3 {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    .journal-entry .meta {
+      font-family: var(--font-sans);
       font-size: 0.8rem;
-      font-weight: 500;
-      margin: 4px 0 12px 0;
+      color: var(--fg-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      display: block;
     }
-    .journal-text {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
+    .journal-entry p { margin: 0; color: var(--fg); }
 
-    /* Music list */
-    .song {
+    /* MUSIC LIST (Index format) */
+    .music-list {
+      list-style: none;
+      padding: 0; margin: 0;
+      border-top: 1px solid var(--border);
+    }
+    .music-list li {
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: baseline;
       padding: 12px 0;
       border-bottom: 1px solid var(--border);
     }
-    .song:last-child { border-bottom: none; }
-    .song .left {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .song-num {
-      color: var(--muted);
-      font-family: monospace;
-      font-size: 0.9rem;
-    }
-    .song-name {
-      font-size: 0.95rem;
-      font-weight: 600;
-    }
-    .song-artist {
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-    .pill {
-      font-size: 0.75rem;
-      color: var(--muted);
-      background: var(--bg);
-      padding: 4px 8px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-    }
+    .music-list .track { font-weight: 500; }
+    .music-list .artist { color: var(--fg-muted); font-size: 0.85rem; font-family: var(--font-serif); font-style: italic; }
 
-    /* Widgets */
-    .widget-grid {
+    /* LAB / WIDGETS */
+    .lab-grid {
       display: grid;
-      gap: 20px;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 300px 1fr;
+      gap: 24px;
     }
-    .word-box .word {
-      font-size: 1.8rem;
-      font-weight: 800;
+
+    .dict-entry .word { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; margin-bottom: 4px; }
+    .dict-entry .pronunciation { font-family: var(--font-sans); color: var(--fg-muted); margin-bottom: 16px; font-size: 0.9rem; }
+    .dict-entry .definition { font-size: 0.95rem; margin-bottom: 12px; }
+    .dict-entry .example { font-family: var(--font-serif); font-style: italic; color: var(--fg-muted); font-size: 0.9rem; border-left: 2px solid var(--border); padding-left: 12px;}
+
+    .timer-display {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 20px 0;
       letter-spacing: -1px;
-      margin-top: 8px;
-    }
-    .word-box .phonetic {
-      color: var(--accent);
-      font-family: monospace;
-      font-size: 0.9rem;
-      margin-bottom: 12px;
-    }
-    .word-box .meaning { font-size: 0.95rem; }
-    .word-box .example {
-      margin-top: 8px;
-      color: var(--muted);
-      font-size: 0.85rem;
-      font-style: italic;
     }
 
-    .pomodoro { text-align: center; }
-    .pomodoro .timer {
-      font-size: 3.5rem;
-      font-weight: 800;
-      letter-spacing: -2px;
-      font-family: monospace;
-      margin: 10px 0;
-      color: var(--text);
-    }
-    .pomodoro .tiny {
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-bottom: 20px;
-    }
-    .pomodoro .row {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-    }
-
-    .note textarea {
-      width: 100%;
-      min-height: 140px;
-      background: var(--bg);
+    /* MARKDOWN EDITOR */
+    .md-editor-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
       border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 8px;
-      padding: 12px;
-      outline: none;
-      resize: vertical;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.9rem;
-      margin: 12px 0;
-      transition: border-color 0.2s;
+      min-height: 250px;
     }
-    .note textarea:focus { border-color: var(--accent); }
-    .note .tiny { color: var(--muted); font-size: 0.75rem; }
+    .md-pane {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+    .md-pane-header {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--fg-muted);
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+    .md-editor-container textarea {
+      width: 100%;
+      flex: 1;
+      border: none;
+      background: transparent;
+      resize: none;
+      color: var(--fg);
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .md-preview {
+      border-left: 1px solid var(--border);
+      background: var(--bg-alt);
+      font-size: 0.9rem;
+      overflow-y: auto;
+    }
+    .md-preview p { margin-top: 0; }
+    .md-preview h1, .md-preview h2, .md-preview h3 { font-size: 1.1em; margin-top: 0; }
+    .md-preview pre { background: var(--bg); padding: 8px; border: 1px solid var(--border); overflow-x: auto; font-size: 0.8em; }
+    .md-preview code { font-family: 'Courier New', Courier, monospace; background: var(--bg); padding: 2px 4px; }
+    
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    button.solid {
+      background: var(--fg);
+      color: var(--bg);
+      border: 1px solid var(--fg);
+      padding: 6px 16px;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+    button.solid:hover { opacity: 0.8; }
+    button.outline {
+      background: transparent;
+      color: var(--fg);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      font-family: var(--font-sans);
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    button.outline:hover { background: var(--bg-alt); }
 
-    /* Footer */
+    /* FOOTER */
     .footer {
-      margin-top: 80px;
-      padding-top: 40px;
       border-top: 1px solid var(--border);
+      padding-top: 30px;
+      margin-top: 60px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      color: var(--muted);
       font-size: 0.85rem;
-    }
-    .mono { font-family: monospace; }
-
-    /* utils */
-    .muted { color: var(--muted); }
-
-    /* responsive */
-    @media (max-width: 800px) {
-      .hero { grid-template-columns: 1fr; gap: 40px; }
-      .grid-3, .grid-2, .widget-grid { grid-template-columns: 1fr; }
-      .nav-links { display: none; }
-      .profile-card { max-width: 400px; margin: 0 auto; }
+      color: var(--fg-muted);
+      font-family: var(--font-serif);
     }
 
-    /* Animation */
-    .reveal {
-      opacity: 0;
-      transform: translateY(20px);
-      animation: reveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    .reveal:nth-child(2) { animation-delay: 0.1s; }
-    .reveal:nth-child(3) { animation-delay: 0.2s; }
-    .reveal:nth-child(4) { animation-delay: 0.3s; }
-    .reveal:nth-child(5) { animation-delay: 0.4s; }
-
-    @keyframes reveal {
-      to { opacity: 1; transform: translateY(0); }
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .topbar { flex-direction: column; align-items: flex-start; gap: 20px; }
+      .nav-controls { align-items: flex-start; }
+      .grid-3, .grid-2 { grid-template-columns: 1fr; }
+      .lab-grid { grid-template-columns: 1fr; }
+      .md-editor-container { grid-template-columns: 1fr; }
+      .md-preview { border-left: none; border-top: 1px solid var(--border); }
     }
   </style>
 </head>
 <body>
+
   <div class="container">
-    <!-- NAV -->
-    <header class="topbar reveal">
+    
+    <!-- HEADER -->
+    <header class="topbar">
       <div class="brand">
-        <span class="brand-dot"></span>
-        JULIAN.
-        <span class="brand-sub">I.O.P.</span>
+        <h1>Julian.</h1>
+        <span>In Omnia Paratus</span>
       </div>
-
-      <nav class="nav-links">
-        <a href="#about">About</a>
-        <a href="#projects">Projects</a>
-        <a href="#journal">Journal</a>
-        <a href="#music">Music</a>
-        <a href="#lab">Lab</a>
-      </nav>
-
-      <div class="actions">
-        <button class="icon-btn" id="accentBtn" title="Change Accent Color">✧</button>
-        <button class="icon-btn" id="themeBtn" title="Toggle Theme">☾</button>
+      <div class="nav-controls">
+        <button class="theme-btn" id="themeBtn">Dark Mode</button>
+        <nav class="nav-links">
+          <a href="#abstract">Abstract</a>
+          <a href="#projects">Research/Projects</a>
+          <a href="#journal">Journal</a>
+          <a href="#lab">Lab</a>
+        </nav>
       </div>
     </header>
 
-    <!-- HERO -->
-    <section class="hero reveal">
-      <div>
-        <h1 class="title">
-          Hi, I’m <span>Julian</span>.
-        </h1>
-
-        <div class="subtitle">
-          一个在现实里写作业、在脑子里造系统的人。I build things, study hard, overthink everything, and try to keep it minimal.
-        </div>
-
-        <div class="typing-line">
-          <span class="muted">Currently:</span> <span id="typingText"></span><span id="cursor">|</span>
-        </div>
-
-        <div class="hero-cta">
-          <a class="btn primary" href="#projects">View Work</a>
-          <button class="btn" id="scrollLabBtn">Study Lab</button>
-        </div>
-      </div>
-
-      <aside class="profile-card">
-        <div class="avatar">J</div>
-        <div class="quick-facts">
-          <div class="fact"><span class="k">Vibe</span><span class="v">Sexy Nerd</span></div>
-          <div class="fact"><span class="k">Status</span><span class="v">Student Mode</span></div>
-          <div class="fact"><span class="k">Focus</span><span class="v">Deep Work</span></div>
-          <div class="fact"><span class="k">Fuel</span><span class="v">Pop Music</span></div>
-        </div>
-      </aside>
-    </section>
-
-    <!-- ABOUT -->
-    <section id="about" class="section reveal">
-      <h2>About me</h2>
-      <div class="desc">一点点自我介绍。Just enough to know the plot.</div>
-
-      <div class="grid grid-3">
-        <div class="card">
-          <h3>Student brain</h3>
-          <p>我是那种一边被作业追着跑，一边还想把生活做成产品的人。I like structure and turning messy things into clean workflows.</p>
-          <div class="tag-row">
-            <span class="tag">Routines</span>
-            <span class="tag">Deep work</span>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Tech obsession</h3>
-          <p>喜欢 AI、前端界面、自动化。I enjoy building things that feel smart, useful, and brutally simple.</p>
-          <div class="tag-row">
-            <span class="tag">AI tools</span>
-            <span class="tag">Dev</span>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Chem + Design</h3>
-          <p>理科脑 but aesthetic heart. I care about clear logic, but also how things look and feel. Pretty + precise.</p>
-          <div class="tag-row">
-            <span class="tag">Chemistry</span>
-            <span class="tag">Minimal</span>
-          </div>
-        </div>
-      </div>
+    <!-- ABSTRACT / HERO -->
+    <section id="abstract" class="abstract">
+      <p><strong>Abstract.</strong> 一个在现实里写作业、在脑子里造系统的人。I build things, study hard, overthink everything, and still make time for music and precise interfaces. 理科脑 but aesthetic heart. I care about clear logic, but also how things look, feel, and move. Pretty + precise is the goal.</p>
+      
+      <table class="status-table">
+        <tbody>
+          <tr>
+            <th>Current Focus</th>
+            <td><span id="typingText"></span><span id="cursor">|</span></td>
+          </tr>
+          <tr>
+            <th>Persona</th>
+            <td>Sexy Nerd / Student Mode</td>
+          </tr>
+          <tr>
+            <th>Methodology</th>
+            <td>Deep Work, Systems Thinking, Minimal Design</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
     <!-- PROJECTS -->
-    <section id="projects" class="section reveal">
-      <h2>Projects</h2>
-      <div class="desc">Some things I build when I should probably be sleeping.</div>
+    <section id="projects" class="section">
+      <div class="section-header">
+        <h2>Projects & Research</h2>
+      </div>
+      <div class="section-desc">Some things I build when I should probably be sleeping.</div>
 
       <div class="grid grid-2">
         <div class="card">
-          <div class="project-top">
-            <h3>Jarvis / OS</h3>
-            <span class="status">Core</span>
+          <h3>Jarvis — Personal OS</h3>
+          <p>一个偏“私人操作系统”的助手 concept：study support, reminders, ideas, mood-aware interactions, and clean workflows all in one place.</p>
+          <div>
+            <span class="meta-tag">AI</span>
+            <span class="meta-tag">Productivity</span>
           </div>
-          <p>一个偏“私人操作系统”的助手 concept：study support, reminders, ideas, and clean workflows all in one place.</p>
         </div>
         <div class="card">
-          <div class="project-top">
-            <h3>Focus Launcher</h3>
-            <span class="status">Design</span>
+          <h3>Deep Work Launcher</h3>
+          <p>一个 anti-distraction 的 home experience：focus-first UI, quick check-ins, and calm visual language. Less chaos, more output.</p>
+          <div>
+            <span class="meta-tag">Android</span>
+            <span class="meta-tag">Focus</span>
           </div>
-          <p>一个 anti-distraction 的 home experience：focus-first UI, quick check-ins, and calm visual language.</p>
         </div>
         <div class="card">
-          <div class="project-top">
-            <h3>MyMedia Wall</h3>
-            <span class="status">Fun</span>
+          <h3>MyMedia Wall</h3>
+          <p>一个电影/剧集展示与整理页面。Clean cards, smooth motion, and strict typography. Because yes, aesthetics matter.</p>
+          <div>
+            <span class="meta-tag">Frontend</span>
+            <span class="meta-tag">UI/UX</span>
           </div>
-          <p>电影/剧集展示与整理页面。Clean typography, solid grid, and “this looks expensive” vibes.</p>
         </div>
         <div class="card">
-          <div class="project-top">
-            <h3>Brutalist R&D</h3>
-            <span class="status">Visual</span>
+          <h3>Brutalist R&D</h3>
+          <p>抛弃拟物与冗余，回归学术与极简的纯粹排版实验。Experimenting with pure typography, high contrast, and grid systems.</p>
+          <div>
+            <span class="meta-tag">Design System</span>
+            <span class="meta-tag">CSS</span>
           </div>
-          <p>抛弃玻璃拟物风，拥抱极简。Experimenting with pure typography, high contrast, and grid systems.</p>
         </div>
       </div>
     </section>
 
-    <!-- JOURNAL + MUSIC -->
-    <section id="journal" class="section reveal">
-      <h2>Journal & Music</h2>
-      <div class="desc">Honest notes and the soundtrack that keeps me sane.</div>
-
+    <!-- JOURNAL & MUSIC -->
+    <section id="journal" class="section">
+      <div class="section-header">
+        <h2>Field Notes & Audio Logs</h2>
+      </div>
+      
       <div class="grid grid-2">
-        <div class="card" style="padding: 0 24px;">
-          <div class="journal-item">
-            <div class="journal-title">This week: staying consistent</div>
-            <div class="journal-meta">Self-management</div>
-            <div class="journal-text">有时候状态会掉线，但我在学着把节奏拉回来。Not chasing perfection anymore — just trying to keep moving.</div>
+        <!-- Journal -->
+        <div>
+          <div class="section-desc" style="margin-bottom: 24px;">Weekly observations.</div>
+          
+          <div class="journal-entry">
+            <h3>Trying to stay consistent</h3>
+            <span class="meta">Self-management • This Week</span>
+            <p>有时候状态会掉线，但我在学着把节奏拉回来。Not chasing perfection anymore — just trying to keep moving.</p>
           </div>
-          <div class="journal-item">
-            <div class="journal-title">Tiny progress</div>
-            <div class="journal-meta">Study notes</div>
-            <div class="journal-text">把任务切小真的有用。10分钟开始，反而能做很久。Classic brain trick, but it works.</div>
+          
+          <div class="journal-entry">
+            <h3>Tiny progress is still progress</h3>
+            <span class="meta">Study Notes • Last Week</span>
+            <p>我发现把任务切小真的有用。10分钟开始，反而能做很久。Classic brain trick, but it works.</p>
           </div>
-          <div class="journal-item">
-            <div class="journal-title">Life as a product</div>
-            <div class="journal-meta">Systems</div>
-            <div class="journal-text">我想把生活做得更可用：提醒、流程、界面。If life is messy, build a better UI for it.</div>
+
+          <div class="journal-entry">
+            <h3>Designing my life like a product</h3>
+            <span class="meta">Systems Thinking</span>
+            <p>我想把生活做得更可用：提醒、流程、界面、反馈。If life is messy, build a better UI for it.</p>
           </div>
         </div>
 
-        <div id="music" class="card">
-          <h3>Now Playing</h3>
-          <p style="margin-bottom: 24px;">Pop-heavy. Emotion-heavy. You know the drill.</p>
-
-          <div class="song">
-            <div class="left">
-              <div class="song-num">01</div>
-              <div>
-                <div class="song-name">Love Story</div>
-                <div class="song-artist">Taylor Swift</div>
-              </div>
-            </div>
-            <span class="pill">classic</span>
-          </div>
-          <div class="song">
-            <div class="left">
-              <div class="song-num">02</div>
-              <div>
-                <div class="song-name">Birds of a Feather</div>
-                <div class="song-artist">Billie Eilish</div>
-              </div>
-            </div>
-            <span class="pill">loop</span>
-          </div>
-          <div class="song">
-            <div class="left">
-              <div class="song-num">03</div>
-              <div>
-                <div class="song-name">I Don’t Wanna Live Forever</div>
-                <div class="song-artist">ZAYN & Taylor Swift</div>
-              </div>
-            </div>
-            <span class="pill">night</span>
-          </div>
-          <div class="song">
-            <div class="left">
-              <div class="song-num">04</div>
-              <div>
-                <div class="song-name">Gracie / Olivia mix</div>
-                <div class="song-artist">Mood rotation</div>
-              </div>
-            </div>
-            <span class="pill">daily</span>
-          </div>
+        <!-- Music -->
+        <div>
+          <div class="section-desc" style="margin-bottom: 24px;">Brain fuel. Pop-heavy, obviously.</div>
+          
+          <ul class="music-list">
+            <li>
+              <span class="track">Love Story</span>
+              <span class="artist">Taylor Swift</span>
+            </li>
+            <li>
+              <span class="track">Birds of a Feather</span>
+              <span class="artist">Billie Eilish</span>
+            </li>
+            <li>
+              <span class="track">I Don’t Wanna Live Forever</span>
+              <span class="artist">ZAYN & Taylor Swift</span>
+            </li>
+            <li>
+              <span class="track">exile (feat. Bon Iver)</span>
+              <span class="artist">Taylor Swift</span>
+            </li>
+            <li>
+              <span class="track">Gracie / Olivia / Ellie Mix</span>
+              <span class="artist">Rotation</span>
+            </li>
+          </ul>
         </div>
       </div>
     </section>
 
     <!-- LAB -->
-    <section id="lab" class="section reveal">
-      <h2>Study Lab</h2>
-      <div class="desc">Small tools, real use. Less UI, more focus.</div>
+    <section id="lab" class="section">
+      <div class="section-header">
+        <h2>Study Lab</h2>
+      </div>
+      <div class="section-desc">Practical apparatus. Focus and documentation.</div>
 
-      <div class="widget-grid">
-        <!-- vocab -->
-        <div class="card word-box">
-          <div class="muted" style="font-size: 0.8rem; text-transform: uppercase;">Word of the Day</div>
-          <div class="word" id="wordText">resilient</div>
-          <div class="phonetic" id="wordPhonetic">/rɪˈzɪliənt/</div>
-          <div class="meaning" id="wordMeaning">adj. able to recover quickly after difficulties</div>
-          <div class="example" id="wordExample">Example: Even after a messy day, he stayed resilient.</div>
-          <button class="btn" id="newWordBtn" style="margin-top: 16px; width: 100%;">Shuffle</button>
-        </div>
+      <div class="lab-grid">
+        
+        <!-- Left Col: Word & Timer -->
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+          <!-- Word -->
+          <div class="card dict-entry">
+            <div class="md-pane-header" style="border:none; padding:0; margin-bottom: 8px;">Lexicon</div>
+            <div class="word" id="wordText">resilient</div>
+            <div class="pronunciation" id="wordPhonetic">/rɪˈzɪliənt/</div>
+            <div class="definition" id="wordMeaning">adj. able to recover quickly after difficulties</div>
+            <div class="example" id="wordExample">Even after a messy day, he stayed resilient and got back to work.</div>
+            <button class="outline" id="newWordBtn" style="margin-top: 16px; width: 100%;">Next Word</button>
+          </div>
 
-        <!-- pomodoro -->
-        <div class="card pomodoro">
-          <div class="muted" style="font-size: 0.8rem; text-transform: uppercase;">Timer</div>
-          <div class="timer" id="timerDisplay">25:00</div>
-          <div class="tiny" id="timerState">Focus • ready</div>
-          <div class="row">
-            <button class="btn primary" id="startTimerBtn">Start</button>
-            <button class="btn" id="switchModeBtn">Break</button>
-            <button class="icon-btn" id="resetTimerBtn" style="border:1px solid var(--border); border-radius:8px; width:40px;">↺</button>
+          <!-- Pomodoro -->
+          <div class="card text-center">
+            <div class="md-pane-header" style="border:none; padding:0;">Pomodoro Protocol</div>
+            <div class="timer-display" id="timerDisplay">25:00</div>
+            <div style="color: var(--fg-muted); font-size: 0.8rem; text-align: center; margin-bottom: 16px;" id="timerState">Session: Ready</div>
+            <div class="btn-group" style="justify-content: center; margin-top: 0;">
+              <button class="solid" id="startTimerBtn">Start</button>
+              <button class="outline" id="switchModeBtn">Break</button>
+              <button class="outline" id="resetTimerBtn">↺</button>
+            </div>
           </div>
         </div>
 
-        <!-- quick note -->
-        <div class="card note">
-          <div class="muted" style="font-size: 0.8rem; text-transform: uppercase;">Brain Dump</div>
-          <textarea id="quickNote" placeholder="Dump thoughts here..."></textarea>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="btn primary" id="saveNoteBtn" style="flex:1;">Save</button>
-            <button class="btn" id="clearNoteBtn">Clear</button>
+        <!-- Right Col: Markdown Notes -->
+        <div>
+          <div class="card" style="height: 100%; display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+              <div class="md-pane-header" style="border:none; padding:0; margin-bottom: 12px;">Markdown Sandbox / Quick Dump</div>
+              <span id="saveStatus" style="font-size: 0.7rem; color: var(--fg-muted);">Local Storage Active</span>
+            </div>
+            
+            <div class="md-editor-container">
+              <div class="md-pane">
+                <div class="md-pane-header">Input (Markdown)</div>
+                <textarea id="quickNote" placeholder="Write your thought / task here... Use **bold**, *italics*, or lists!"></textarea>
+              </div>
+              <div class="md-pane md-preview" id="mdPreview">
+                <div class="md-pane-header">Output Render</div>
+                <div id="mdOutput"></div>
+              </div>
+            </div>
+
+            <div class="btn-group" style="justify-content: flex-end;">
+              <button class="outline" id="clearNoteBtn">Clear</button>
+              <button class="solid" id="saveNoteBtn">Save</button>
+            </div>
           </div>
-          <div class="tiny" id="saveStatus" style="margin-top: 8px;">Local storage active.</div>
         </div>
+
       </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="footer reveal">
-      <div>© <span id="year"></span> Julian. Minimalist overhaul.</div>
-      <div class="mono">In Omnia Paratus.</div>
+    <footer class="footer">
+      <div>© <span id="year"></span> Julian. Strict layout.</div>
+      <div>In Omnia Paratus.</div>
     </footer>
+
   </div>
 
   <script>
-    // Theme toggle
-    const html = document.documentElement;
+    // --- Theme Control ---
+    const body = document.documentElement;
     const themeBtn = document.getElementById('themeBtn');
-    const savedTheme = localStorage.getItem('julian_theme_v2');
+    const savedTheme = localStorage.getItem('julian_academic_theme');
     
-    // Default to dark
-    if (savedTheme === 'light') {
-      html.setAttribute('data-theme', 'light');
-      themeBtn.textContent = '☀';
-    } else {
-      html.removeAttribute('data-theme');
-      themeBtn.textContent = '☾';
+    if (savedTheme === 'dark') {
+      body.setAttribute('data-theme', 'dark');
+      themeBtn.textContent = 'Light Mode';
     }
 
     themeBtn.addEventListener('click', () => {
-      const isLight = html.getAttribute('data-theme') === 'light';
-      if (isLight) {
-        html.removeAttribute('data-theme');
-        localStorage.setItem('julian_theme_v2', 'dark');
-        themeBtn.textContent = '☾';
+      const isDark = body.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        body.removeAttribute('data-theme');
+        localStorage.setItem('julian_academic_theme', 'light');
+        themeBtn.textContent = 'Dark Mode';
       } else {
-        html.setAttribute('data-theme', 'light');
-        localStorage.setItem('julian_theme_v2', 'light');
-        themeBtn.textContent = '☀';
+        body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('julian_academic_theme', 'dark');
+        themeBtn.textContent = 'Light Mode';
       }
     });
 
-    // Accent colors
-    const accents = ['#2563eb', '#dc2626', '#16a34a', '#9333ea', '#ea580c'];
-    let accIdx = Number(localStorage.getItem('julian_acc_v2') || 0);
-    
-    function setAccent(idx) {
-      document.documentElement.style.setProperty('--accent', accents[idx]);
-      localStorage.setItem('julian_acc_v2', idx);
-    }
-    setAccent(accIdx);
-
-    document.getElementById('accentBtn').addEventListener('click', () => {
-      accIdx = (accIdx + 1) % accents.length;
-      setAccent(accIdx);
-    });
-
-    // Typing effect
+    // --- Typing Effect ---
     const typingText = document.getElementById('typingText');
     const cursor = document.getElementById('cursor');
     const phrases = [
-      'designing things that feel expensive.',
-      'studying chemistry, one concept at a time.',
-      'building a cleaner life system.',
-      'winning against procrastination (mostly).'
+      'Building a cleaner life system.',
+      'Studying chemistry, one concept at a time.',
+      'Refining algorithms and routines.',
+      'Designing things that feel serious.'
     ];
     let pIndex = 0, cIndex = 0, deleting = false;
 
@@ -790,25 +630,18 @@
           pIndex = (pIndex + 1) % phrases.length;
         }
       }
-      setTimeout(typeLoop, deleting ? 30 : 60);
+      setTimeout(typeLoop, deleting ? 20 : 50);
     }
     typeLoop();
+    setInterval(() => cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0', 500);
 
-    setInterval(() => {
-      cursor.style.opacity = cursor.style.opacity === '0' ? '1' : '0';
-    }, 500);
-
-    // Scroll
-    document.getElementById('scrollLabBtn').addEventListener('click', () => {
-      document.getElementById('lab').scrollIntoView({ behavior: 'smooth' });
-    });
-
-    // Word of the Day
+    // --- Lexicon (Word of the Day) ---
     const words = [
-      { w: "resilient", p: "/rɪˈzɪliənt/", m: "adj. able to recover quickly", e: "Even after a messy day, he stayed resilient." },
-      { w: "meticulous", p: "/məˈtɪkjələs/", m: "adj. very careful and precise", e: "His notes were meticulous and clean." },
-      { w: "coherent", p: "/koʊˈhɪrənt/", m: "adj. logical and well organized", e: "The explanation finally felt coherent." },
-      { w: "lucid", p: "/ˈluːsɪd/", m: "adj. clear and easy to understand", e: "A lucid solution beats a complicated one." }
+      { w: "resilient", p: "/rɪˈzɪliənt/", m: "adj. able to recover quickly after difficulties", e: "Even after a messy day, he stayed resilient." },
+      { w: "meticulous", p: "/məˈtɪkjələs/", m: "adj. very careful and precise", e: "His notes were meticulous — clean, clear, and impossible to misread." },
+      { w: "coherent", p: "/koʊˈhɪrənt/", m: "adj. logical and well organized", e: "The explanation finally felt coherent, so the problem became easy." },
+      { w: "lucid", p: "/ˈluːsɪd/", m: "adj. clear and easy to understand", e: "A lucid solution beats a complicated one every time." },
+      { w: "pragmatic", p: "/præɡˈmætɪk/", m: "adj. dealing with things sensibly and realistically", e: "He took a pragmatic approach to the complex physics problem." }
     ];
     
     document.getElementById('newWordBtn').addEventListener('click', () => {
@@ -816,10 +649,10 @@
       document.getElementById('wordText').textContent = item.w;
       document.getElementById('wordPhonetic').textContent = item.p;
       document.getElementById('wordMeaning').textContent = item.m;
-      document.getElementById('wordExample').textContent = "Example: " + item.e;
+      document.getElementById('wordExample').textContent = item.e;
     });
 
-    // Pomodoro Timer
+    // --- Pomodoro ---
     let isFocus = true, totalSeconds = 25 * 60, ticking = false, timerId = null;
     const tDisp = document.getElementById('timerDisplay'), tState = document.getElementById('timerState');
     const btnStart = document.getElementById('startTimerBtn'), btnMode = document.getElementById('switchModeBtn');
@@ -837,14 +670,14 @@
       drawTime();
       btnStart.textContent = 'Start';
       btnMode.textContent = isFocus ? 'Break' : 'Focus';
-      tState.textContent = isFocus ? 'Focus • ready' : 'Break • ready';
+      tState.textContent = isFocus ? 'Session: Ready' : 'Break: Ready';
     }
 
     btnStart.addEventListener('click', () => {
       if (!ticking) {
         ticking = true;
         btnStart.textContent = 'Pause';
-        tState.textContent = isFocus ? 'Focus • running' : 'Break • running';
+        tState.textContent = isFocus ? 'Session: Active' : 'Break: Active';
         timerId = setInterval(() => {
           totalSeconds--;
           drawTime();
@@ -852,13 +685,13 @@
             clearInterval(timerId);
             ticking = false;
             btnStart.textContent = 'Start';
-            tState.textContent = 'Done ✅';
+            tState.textContent = 'Complete.';
             try {
               const ctx = new (window.AudioContext || window.webkitAudioContext)();
               const osc = ctx.createOscillator(), gain = ctx.createGain();
               osc.connect(gain); gain.connect(ctx.destination);
-              osc.frequency.value = 880; gain.gain.value = 0.05;
-              osc.start(); setTimeout(() => { osc.stop(); ctx.close(); }, 200);
+              osc.frequency.value = 600; gain.gain.value = 0.05;
+              osc.start(); setTimeout(() => { osc.stop(); ctx.close(); }, 300);
             } catch(e){}
           }
         }, 1000);
@@ -866,7 +699,7 @@
         ticking = false;
         clearInterval(timerId);
         btnStart.textContent = 'Resume';
-        tState.textContent = 'Paused ⏸';
+        tState.textContent = 'Paused.';
       }
     });
 
@@ -874,25 +707,49 @@
     btnMode.addEventListener('click', () => reset(!isFocus));
     drawTime();
 
-    // Notes
+    // --- Markdown Editor ---
     const quickNote = document.getElementById('quickNote');
+    const mdOutput = document.getElementById('mdOutput');
     const saveStatus = document.getElementById('saveStatus');
-    quickNote.value = localStorage.getItem('julian_note_v2') || '';
 
-    document.getElementById('saveNoteBtn').addEventListener('click', () => {
-      localStorage.setItem('julian_note_v2', quickNote.value);
-      saveStatus.textContent = 'Saved ✓';
+    // Default text if empty
+    const defaultMD = "### Daily Objective\n- Complete Chemistry lab report.\n- Review *Thermodynamics* chapter.\n\n> In Omnia Paratus.";
+
+    // Load from local storage
+    quickNote.value = localStorage.getItem('julian_academic_note') || defaultMD;
+
+    // Render Function
+    function renderMD() {
+      // Use marked.js library loaded in head
+      mdOutput.innerHTML = marked.parse(quickNote.value);
+    }
+    
+    // Initial Render
+    renderMD();
+
+    // Live Edit
+    quickNote.addEventListener('input', () => {
+      renderMD();
+      saveStatus.textContent = 'Unsaved changes...';
     });
+
+    // Save & Clear
+    document.getElementById('saveNoteBtn').addEventListener('click', () => {
+      localStorage.setItem('julian_academic_note', quickNote.value);
+      saveStatus.textContent = 'Saved.';
+    });
+    
     document.getElementById('clearNoteBtn').addEventListener('click', () => {
       quickNote.value = '';
-      localStorage.removeItem('julian_note_v2');
+      renderMD();
+      localStorage.removeItem('julian_academic_note');
       saveStatus.textContent = 'Cleared.';
     });
-    quickNote.addEventListener('input', () => saveStatus.textContent = 'Unsaved...');
 
-    // Year
+    // --- Footer Year ---
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
+
 
