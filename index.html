@@ -6,522 +6,177 @@
   <title>Zevora 控制台</title>
   <style>
     :root {
-      --bg: #fdfdfc;
-      --fg: #1a1a1a;
-      --fg-muted: #555555;
-      --border: #dcdcdc;
-      --border-heavy: #1a1a1a;
-      --accent: #000000;
-      --bg-alt: #f4f4f0;
-      --font-sans: 'Inter', system-ui, sans-serif;
-      --font-serif: 'Merriweather', Georgia, serif;
-      --radius: 0px; /* Serious = sharp edges */
+      --bg: #f8f8f6;
+      --fg: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --card: #ffffff;
+      --accent: #111827;
+      --accent-invert: #ffffff;
     }
 
     [data-theme="dark"] {
-      --bg: #121212;
-      --fg: #e4e4e4;
-      --fg-muted: #a0a0a0;
-      --border: #333333;
-      --border-heavy: #e4e4e4;
-      --accent: #ffffff;
-      --bg-alt: #1a1a1a;
+      --bg: #111827;
+      --fg: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #374151;
+      --card: #1f2937;
+      --accent: #e5e7eb;
+      --accent-invert: #111827;
     }
 
     * { box-sizing: border-box; }
-    
     body {
       margin: 0;
-      padding: 0;
-      background-color: var(--bg);
+      background: var(--bg);
       color: var(--fg);
-      font-family: var(--font-sans);
-      line-height: 1.7;
-      font-size: 15px;
-      transition: background-color 0.3s, color 0.3s;
-      -webkit-font-smoothing: antialiased;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
+      line-height: 1.6;
+      transition: .2s;
     }
-
-    h1, h2, h3, h4 {
-      font-family: var(--font-serif);
-      color: var(--fg);
-      margin-top: 0;
-      font-weight: 700;
-    }
-
-    a {
-      color: var(--fg);
-      text-decoration: none;
-      border-bottom: 1px solid var(--border);
-      transition: border-color 0.2s;
-    }
-    a:hover { border-bottom-color: var(--fg); }
 
     .container {
-      max-width: 880px;
+      max-width: 1000px;
       margin: 0 auto;
-      padding: 0 24px 80px;
+      padding: 20px;
     }
 
-    /* TOP BAR - Academic Header */
     .topbar {
-      border-bottom: 2px solid var(--border-heavy);
-      padding: 30px 0 15px;
-      margin-bottom: 50px;
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-    }
-
-    .brand {
-      font-family: var(--font-serif);
-    }
-    .brand h1 {
-      font-size: 1.8rem;
-      margin: 0 0 4px 0;
-      letter-spacing: -0.5px;
-    }
-    .brand span {
-      font-family: var(--font-sans);
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--fg-muted);
-    }
-
-    .nav-controls {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
+      align-items: center;
       gap: 12px;
+      border-bottom: 2px solid var(--fg);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
     }
 
-    .nav-links {
+    .title { font-size: 1.25rem; font-weight: 700; }
+    .muted { color: var(--muted); font-size: .92rem; }
+
+    .toolbar {
       display: flex;
-      gap: 16px;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 16px;
     }
-    .nav-links a { border: none; font-weight: 500; color: var(--fg-muted); }
-    .nav-links a:hover { color: var(--fg); }
 
-    .theme-btn {
-      background: none;
+    button, input, textarea {
+      font: inherit;
       border: 1px solid var(--border);
+      background: transparent;
       color: var(--fg);
-      font-family: var(--font-sans);
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      cursor: pointer;
-      text-transform: uppercase;
+      padding: 8px 10px;
     }
-    .theme-btn:hover { background: var(--bg-alt); }
-
-    /* SECTION STYLES */
-    .section {
-      margin-bottom: 60px;
-    }
-    .section-header {
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 24px;
-      padding-bottom: 8px;
-    }
-    .section-header h2 {
-      font-size: 1.4rem;
-      margin: 0;
-    }
-    .section-desc {
-      font-family: var(--font-serif);
-      font-style: italic;
-      color: var(--fg-muted);
-      font-size: 0.95rem;
-      margin-bottom: 30px;
+    textarea { width: 100%; min-height: 90px; resize: vertical; }
+    button { cursor: pointer; }
+    .primary {
+      background: var(--accent);
+      color: var(--accent-invert);
+      border-color: var(--accent);
     }
 
-    /* GRID & CARDS */
+    .tabs { display: flex; gap: 8px; }
+    .tabs button.active { border-color: var(--fg); font-weight: 600; }
+
     .grid {
       display: grid;
-      gap: 24px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
     }
-    .grid-3 { grid-template-columns: repeat(3, 1fr); }
-    .grid-2 { grid-template-columns: repeat(2, 1fr); }
-
     .card {
+      background: var(--card);
       border: 1px solid var(--border);
-      padding: 24px;
-      background: var(--bg);
+      padding: 14px;
+      border-radius: 6px;
     }
-    .card h3 {
-      font-size: 1.1rem;
-      margin-bottom: 12px;
-    }
-    .card p {
-      color: var(--fg-muted);
-      font-size: 0.9rem;
-      margin: 0 0 16px 0;
-    }
-    
-    .meta-tag {
-      display: inline-block;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: var(--bg-alt);
-      border: 1px solid var(--border);
-      padding: 2px 6px;
-      color: var(--fg-muted);
-      margin-right: 6px;
-      margin-bottom: 6px;
-    }
+    .hidden { display: none !important; }
 
-    /* HERO PROFILE (Abstracted) */
-    .abstract {
-      border: 1px solid var(--border);
-      border-left: 4px solid var(--border-heavy);
-      padding: 24px 32px;
-      background: var(--bg-alt);
-      margin-bottom: 60px;
-    }
-    .abstract p { margin: 0 0 12px 0; }
-    .abstract p:last-child { margin: 0; }
-    
-    .status-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 24px;
-      font-size: 0.85rem;
-    }
-    .status-table th, .status-table td {
+    .list {
+      margin-top: 10px;
       border-top: 1px solid var(--border);
-      padding: 8px 0;
-      text-align: left;
-    }
-    .status-table th { color: var(--fg-muted); font-weight: 500; width: 30%; }
-
-    /* JOURNAL */
-    .journal-entry {
-      margin-bottom: 32px;
-    }
-    .journal-entry h3 {
-      font-size: 1.1rem;
-      margin-bottom: 4px;
-    }
-    .journal-entry .meta {
-      font-family: var(--font-sans);
-      font-size: 0.8rem;
-      color: var(--fg-muted);
-      text-transform: uppercase;
-      margin-bottom: 12px;
-      display: block;
-    }
-    .journal-entry p { margin: 0; color: var(--fg); }
-
-    /* MUSIC LIST (Index format) */
-    .music-list {
-      list-style: none;
-      padding: 0; margin: 0;
-      border-top: 1px solid var(--border);
-    }
-    .music-list li {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .music-list .track { font-weight: 500; }
-    .music-list .artist { color: var(--fg-muted); font-size: 0.85rem; font-family: var(--font-serif); font-style: italic; }
-
-    /* LAB / WIDGETS */
-    .lab-grid {
-      display: grid;
-      grid-template-columns: 300px 1fr;
-      gap: 24px;
+      padding-top: 10px;
+      font-size: .92rem;
     }
 
-    .dict-entry .word { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 700; margin-bottom: 4px; }
-    .dict-entry .pronunciation { font-family: var(--font-sans); color: var(--fg-muted); margin-bottom: 16px; font-size: 0.9rem; }
-    .dict-entry .definition { font-size: 0.95rem; margin-bottom: 12px; }
-    .dict-entry .example { font-family: var(--font-serif); font-style: italic; color: var(--fg-muted); font-size: 0.9rem; border-left: 2px solid var(--border); padding-left: 12px;}
+    .message-item { margin-bottom: 8px; }
+    .message-item b { margin-right: 6px; }
 
-    .timer-display {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 3rem;
-      font-weight: 700;
-      text-align: center;
-      margin: 20px 0;
-      letter-spacing: -1px;
-    }
-
-    /* MARKDOWN EDITOR */
-    .md-editor-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0;
-      border: 1px solid var(--border);
-      min-height: 250px;
-    }
-    .md-pane {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-    }
-    .md-pane-header {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--fg-muted);
-      margin-bottom: 12px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 4px;
-    }
-    .md-editor-container textarea {
-      width: 100%;
-      flex: 1;
-      border: none;
-      background: transparent;
-      resize: none;
-      color: var(--fg);
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.9rem;
-      outline: none;
-    }
-    .md-preview {
-      border-left: 1px solid var(--border);
-      background: var(--bg-alt);
-      font-size: 0.9rem;
-      overflow-y: auto;
-    }
-    .md-preview p { margin-top: 0; }
-    .md-preview h1, .md-preview h2, .md-preview h3 { font-size: 1.1em; margin-top: 0; }
-    .md-preview pre { background: var(--bg); padding: 8px; border: 1px solid var(--border); overflow-x: auto; font-size: 0.8em; }
-    .md-preview code { font-family: 'Courier New', Courier, monospace; background: var(--bg); padding: 2px 4px; }
-    
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      margin-top: 12px;
-    }
-    button.solid {
-      background: var(--fg);
-      color: var(--bg);
-      border: 1px solid var(--fg);
-      padding: 6px 16px;
-      font-family: var(--font-sans);
-      font-size: 0.8rem;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: opacity 0.2s;
-    }
-    button.solid:hover { opacity: 0.8; }
-    button.outline {
-      background: transparent;
-      color: var(--fg);
-      border: 1px solid var(--border);
-      padding: 6px 16px;
-      font-family: var(--font-sans);
-      font-size: 0.8rem;
-      cursor: pointer;
-      text-transform: uppercase;
-    }
-    button.outline:hover { background: var(--bg-alt); }
-
-
-    .panel {
-      border: 1px solid var(--border);
-      padding: 18px;
-      margin-bottom: 18px;
-      background: var(--bg);
-    }
-    .panel h3 { margin: 0 0 12px 0; font-size: 1rem; }
-    .input, .textarea {
-      width: 100%;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--fg);
-      padding: 8px;
-      font-family: var(--font-sans);
-      margin-bottom: 10px;
-    }
-    .textarea { min-height: 88px; resize: vertical; }
-    .small { font-size: 0.8rem; color: var(--fg-muted); }
-    .mono { font-family: 'Courier New', Courier, monospace; }
-
-    /* FOOTER */
-    .footer {
-      border-top: 1px solid var(--border);
-      padding-top: 30px;
-      margin-top: 60px;
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      color: var(--fg-muted);
-      font-family: var(--font-serif);
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      .topbar { flex-direction: column; align-items: flex-start; gap: 20px; }
-      .nav-controls { align-items: flex-start; }
-      .grid-3, .grid-2 { grid-template-columns: 1fr; }
-      .lab-grid { grid-template-columns: 1fr; }
-      .md-editor-container { grid-template-columns: 1fr; }
-      .md-preview { border-left: none; border-top: 1px solid var(--border); }
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: 1fr; }
+      .topbar { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
-  <div id="authMask" class="auth-mask">
-    <div class="auth-box">
-      <h2>欢迎使用 Zevora</h2>
-      <p class="muted">请先登录或注册（注册账号自动为访客，禁止注册管理员账号）。</p>
-      <div class="tabs">
-        <button id="tabLogin">登录</button>
-        <button id="tabRegister" class="btn2">注册</button>
-      </div>
-      <div class="nav-controls">
-        <button class="theme-btn" id="themeBtn">Dark Mode</button>
-        <nav class="nav-links">
-          <a href="#abstract">Abstract</a>
-          <a href="#projects">Research/Projects</a>
-          <a href="#journal">Journal</a>
-          <a href="#lab">Lab</a>
-          <a href="#access">Access</a>
-        </nav>
-      </div>
-      <div id="registerPane" class="hidden">
-        <input id="regUser" placeholder="新用户名（不能是 Julian）" />
-        <input id="regPass" type="password" placeholder="密码（至少6位）" />
-        <button id="registerBtn">注册账号</button>
-      </div>
-      <p id="authMsg" class="muted" style="margin-top:10px;"></p>
-    </div>
-  </div>
-
-  <div class="app">
-    <div class="top">
+  <div class="container">
+    <header class="topbar">
       <div>
-        <strong>Zevora Console</strong>
-        <div class="muted" id="whoami">未登录</div>
+        <div class="title">Zevora Console</div>
+        <div id="whoami" class="muted">未登录</div>
       </div>
-      <div class="nav">
-        <button class="active" data-view="overview">概览</button>
-        <button data-view="ai">AI 助手</button>
-        <button data-view="messages">留言板</button>
-        <button data-view="admin">管理员</button>
-        <button id="logoutBtn" class="btn2">退出</button>
-      </div>
+      <button id="themeBtn">切换深色模式</button>
+    </header>
+
+    <div class="toolbar tabs">
+      <button class="active" data-view="overview">概览</button>
+      <button data-view="ai">AI 助手</button>
+      <button data-view="messages">留言板</button>
+      <button data-view="admin">管理员</button>
     </div>
 
-    <section id="overview" class="view card">
-      <h3>系统概览</h3>
-      <div class="grid3">
-        <div class="card"><div class="muted">当前用户</div><div id="ovUser">-</div></div>
-        <div class="card"><div class="muted">角色</div><div id="ovRole">-</div></div>
-        <div class="card"><div class="muted">访客权限</div><div id="ovPolicy">-</div></div>
+    <section id="overview" class="card view">
+      <h3>登录 / 注册</h3>
+      <div class="grid">
+        <div>
+          <input id="loginUsername" placeholder="用户名" />
+          <input id="loginPassword" type="password" placeholder="密码" />
+          <button class="primary" id="loginBtn">登录</button>
+          <button id="logoutBtn">退出</button>
+          <div id="authInfo" class="muted" style="margin-top:8px;">未登录</div>
+        </div>
+        <div>
+          <input id="regUser" placeholder="新用户名（至少3位）" />
+          <input id="regPass" type="password" placeholder="密码（至少6位）" />
+          <button class="primary" id="registerBtn">注册访客账号</button>
+          <div id="registerInfo" class="muted" style="margin-top:8px;"></div>
+        </div>
       </div>
     </section>
 
-    <section id="ai" class="view card hidden">
-      <h3>AI 助手（SiliconFlow / Qwen）</h3>
-      <p class="muted">Base URL: https://api.siliconflow.cn/v1 ，Model: Qwen/Qwen3-8B</p>
+    <section id="ai" class="card view hidden">
+      <h3>AI 助手</h3>
+      <p class="muted">未配置 OPENAI_API_KEY 时会返回 503。</p>
       <textarea id="aiPrompt" placeholder="输入你的问题..."></textarea>
-      <button id="askAiBtn">发送给 AI</button>
-      <div class="card" style="margin-top:12px;white-space:pre-wrap" id="aiReply">等待提问...</div>
+      <button class="primary" id="askAiBtn">发送</button>
+      <div id="aiReply" class="list">等待提问...</div>
     </section>
 
-    <section id="messages" class="view card hidden">
+    <section id="messages" class="card view hidden">
       <h3>留言板</h3>
-      <textarea id="msgInput" placeholder="写留言..."></textarea>
-      <button id="sendMsgBtn">发送留言</button>
-      <p id="msgStatus" class="muted"></p>
-      <div class="list" id="msgList"></div>
+      <textarea id="messageInput" placeholder="写留言..."></textarea>
+      <button class="primary" id="sendMessageBtn">发送留言</button>
+      <div id="messageStatus" class="muted" style="margin-top:8px;"></div>
+      <div id="messageList" class="list">加载中...</div>
     </section>
 
-    <section id="admin" class="view card hidden">
-      <h3>管理员通道</h3>
-      <div id="adminDenied" class="muted">仅管理员可用。</div>
+    <section id="admin" class="card view hidden">
+      <h3>管理员</h3>
+      <div id="adminDenied" class="muted">仅管理员可见。</div>
       <div id="adminBody" class="hidden">
-        <div class="grid">
-          <div class="card">
-            <h3>访客策略</h3>
-            <label><input type="checkbox" id="allowGuestAi"> 允许未登录访客使用 AI</label><br>
-            <label><input type="checkbox" id="allowGuestMsg"> 允许未登录访客留言</label><br><br>
-            <button id="savePolicyBtn">保存策略</button>
-          </div>
-          <div class="card">
-            <h3>创建特邀访客</h3>
-            <input id="ivUser" placeholder="访客用户名" />
-            <input id="ivPass" placeholder="密码（可留空自动生成）" />
-            <button id="createVisitorBtn">创建特邀访客</button>
-            <div id="ivResult" class="muted" style="margin-top:8px"></div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>所有访客</h3>
-          <div id="visitorList" class="list"></div>
-        </div>
+        <label><input type="checkbox" id="allowGuestAiChk" /> 允许访客使用 AI</label><br />
+        <label><input type="checkbox" id="allowGuestMsgChk" /> 允许访客留言</label><br />
+        <button id="saveSettingsBtn" class="primary" style="margin-top:8px;">保存策略</button>
+
+        <hr style="border:0;border-top:1px solid var(--border);margin:14px 0;" />
+
+        <input id="newVisitorName" placeholder="访客用户名" />
+        <button id="createVisitorBtn" class="primary">创建访客</button>
+        <div id="visitorCreated" class="muted" style="margin-top:8px;"></div>
+        <div id="visitorList" class="list"></div>
       </div>
     </section>
-
-
-    <section id="access" class="section">
-      <div class="section-header">
-        <h2>Access & AI Console</h2>
-      </div>
-      <div class="grid grid-2">
-        <div>
-          <div class="panel">
-            <h3>AI Assistant</h3>
-            <textarea id="aiPrompt" class="textarea" placeholder="输入你的问题，例如：帮我规划今天的学习流程"></textarea>
-            <div class="btn-group" style="margin-top:0;">
-              <button class="solid" id="askAiBtn">Ask AI</button>
-            </div>
-            <p id="aiReply" class="small" style="margin-top:12px; white-space: pre-wrap;">AI response will appear here.</p>
-          </div>
-
-          <div class="panel">
-            <h3>留言板（支持访客策略）</h3>
-            <textarea id="messageInput" class="textarea" placeholder="写下一条留言..."></textarea>
-            <button class="solid" id="sendMessageBtn">Send Message</button>
-            <div id="messageStatus" class="small" style="margin-top:8px;"></div>
-            <div id="messageList" class="small" style="margin-top:12px;"></div>
-          </div>
-        </div>
-
-        <div>
-          <div class="panel">
-            <h3>登录通道（Admin / Visitor）</h3>
-            <input id="loginUsername" class="input" placeholder="username" />
-            <input id="loginPassword" class="input" type="password" placeholder="password" />
-            <button class="solid" id="loginBtn">Login</button>
-            <p id="authInfo" class="small" style="margin-top:8px;">未登录</p>
-          </div>
-
-          <div class="panel" id="adminPanel" style="display:none;">
-            <h3>Admin Channel</h3>
-            <label class="small"><input type="checkbox" id="allowGuestAiChk" /> Allow guest AI</label><br/>
-            <label class="small"><input type="checkbox" id="allowGuestMsgChk" /> Allow guest messages</label>
-            <div class="btn-group">
-              <button class="outline" id="saveSettingsBtn">Save Settings</button>
-            </div>
-            <hr style="border:none; border-top:1px solid var(--border); margin:14px 0;">
-            <input id="newVisitorName" class="input" placeholder="new visitor username" />
-            <button class="solid" id="createVisitorBtn">Create Visitor</button>
-            <p id="visitorCreated" class="small mono" style="margin-top:8px;"></p>
-            <div id="visitorList" class="small" style="margin-top:8px;"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-      <div>© <span id="year"></span> Julian. Strict layout.</div>
-      <div>In Omnia Paratus.</div>
-    </footer>
-
   </div>
 
   <script>
@@ -531,162 +186,28 @@
       username: localStorage.getItem('zevora_username') || ''
     };
 
-    const authMask = document.getElementById('authMask');
-    const authMsg = document.getElementById('authMsg');
-
-    function headers(json = true){
+    function headers(isJson = true) {
       const h = {};
-      if (json) h['Content-Type'] = 'application/json';
-      if (API.token) h['Authorization'] = `Bearer ${API.token}`;
+      if (isJson) h['Content-Type'] = 'application/json';
+      if (API.token) h.Authorization = `Bearer ${API.token}`;
       return h;
     }
 
-    function switchView(name){
-      document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+    function switchView(name) {
+      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
       document.getElementById(name).classList.remove('hidden');
-      document.querySelectorAll('.nav button[data-view]').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
-    }
-
-    function renderIdentity(){
-      document.getElementById('whoami').textContent = API.token ? `${API.username} (${API.role})` : '未登录';
-      document.getElementById('ovUser').textContent = API.username || '-';
-      document.getElementById('ovRole').textContent = API.role || '-';
-      const isAdmin = API.role === 'admin';
-      document.getElementById('adminDenied').classList.toggle('hidden', isAdmin);
-      document.getElementById('adminBody').classList.toggle('hidden', !isAdmin);
-    }
-
-    function logout(){
-      API.token=''; API.role=''; API.username='';
-      localStorage.removeItem('zevora_token'); localStorage.removeItem('zevora_role'); localStorage.removeItem('zevora_username');
-      authMask.classList.remove('hidden');
-      renderIdentity();
-    }
-
-    async function doLogin(){
-      const username = document.getElementById('loginUser').value.trim();
-      const password = document.getElementById('loginPass').value;
-      const body = new URLSearchParams({username,password});
-      const r = await fetch('/api/token',{method:'POST',body});
-      if(!r.ok){authMsg.textContent='登录失败，请检查账号密码';return;}
-      const d = await r.json();
-      API.token=d.access_token; API.role=d.role; API.username=d.username;
-      localStorage.setItem('zevora_token',API.token); localStorage.setItem('zevora_role',API.role); localStorage.setItem('zevora_username',API.username);
-      authMask.classList.add('hidden');
-      authMsg.textContent='';
-      renderIdentity();
-      await loadMessages();
-      await loadPolicy();
-      await loadVisitors();
-    }
-
-    async function doRegister(){
-      const username = document.getElementById('regUser').value.trim();
-      const password = document.getElementById('regPass').value;
-      const r = await fetch('/api/register',{method:'POST',headers:headers(true),body:JSON.stringify({username,password})});
-      if(!r.ok){
-        const e = await r.json().catch(()=>({}));
-        authMsg.textContent = `注册失败: ${e.detail || r.status}`;
-        return;
-      }
-      authMsg.textContent='注册成功，请切换到登录并进入系统';
-    }
-
-    async function askAI(){
-      const prompt = document.getElementById('aiPrompt').value.trim();
-      if(!prompt) return;
-      const r = await fetch('/api/ai/chat',{method:'POST',headers:headers(true),body:JSON.stringify({prompt})});
-      const box = document.getElementById('aiReply');
-      if(!r.ok){ const e=await r.json().catch(()=>({})); box.textContent=`请求失败: ${e.detail||r.status}`; return; }
-      const d = await r.json(); box.textContent = d.reply;
-    }
-
-    async function sendMessage(){
-      const content = document.getElementById('msgInput').value.trim(); if(!content) return;
-      const r = await fetch('/api/messages',{method:'POST',headers:headers(true),body:JSON.stringify({content})});
-      const s = document.getElementById('msgStatus');
-      if(!r.ok){ const e=await r.json().catch(()=>({})); s.textContent=`发送失败: ${e.detail||r.status}`; return; }
-      s.textContent='发送成功'; document.getElementById('msgInput').value=''; await loadMessages();
-    }
-
-    async function loadMessages(){
-      const r = await fetch('/api/messages'); if(!r.ok) return;
-      const d = await r.json();
-      const html = d.items.map(i=>`<div style="margin-bottom:8px"><span class="pill">${i.author}</span>${i.content}</div>`).join('') || '暂无留言';
-      document.getElementById('msgList').innerHTML = html;
-    }
-
-    async function loadPolicy(){
-      const r = await fetch('/api/admin/overview',{headers:headers(false)});
-      if(!r.ok){document.getElementById('ovPolicy').textContent='普通用户不可见';return;}
-      const d = await r.json();
-      document.getElementById('allowGuestAi').checked = !!d.settings.allow_guest_ai;
-      document.getElementById('allowGuestMsg').checked = !!d.settings.allow_guest_messages;
-      document.getElementById('ovPolicy').textContent = `AI:${d.settings.allow_guest_ai?'开':'关'} / 留言:${d.settings.allow_guest_messages?'开':'关'}`;
-    }
-
-    async function savePolicy(){
-      const body = {allow_guest_ai:document.getElementById('allowGuestAi').checked,allow_guest_messages:document.getElementById('allowGuestMsg').checked};
-      await fetch('/api/admin/settings',{method:'PATCH',headers:headers(true),body:JSON.stringify(body)});
-      await loadPolicy();
-    }
-
-    async function createVisitor(){
-      const username = document.getElementById('ivUser').value.trim();
-      const password = document.getElementById('ivPass').value.trim();
-      const r = await fetch('/api/admin/visitors',{method:'POST',headers:headers(true),body:JSON.stringify({username,password:password||null})});
-      const out = document.getElementById('ivResult');
-      if(!r.ok){ const e=await r.json().catch(()=>({})); out.textContent=`创建失败: ${e.detail||r.status}`; return; }
-      const d = await r.json(); out.textContent = `创建成功 -> ${d.username} / ${d.password}`; await loadVisitors();
-    }
-
-    async function loadVisitors(){
-      const r = await fetch('/api/admin/visitors',{headers:headers(false)});
-      if(!r.ok){document.getElementById('visitorList').innerHTML='需要管理员权限'; return;}
-      const d = await r.json();
-      document.getElementById('visitorList').innerHTML = d.items.map(i=>`<div><span class='pill'>${i.source}</span><strong>${i.username}</strong> · ${i.enabled?'启用':'禁用'} · ${i.created_at||'-'}</div>`).join('') || '暂无访客';
-    }
-
-    // 导航
-    document.querySelectorAll('.nav button[data-view]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
-
-    // 登录/注册tab
-    const tabLogin = document.getElementById('tabLogin');
-    const tabRegister = document.getElementById('tabRegister');
-    tabLogin.addEventListener('click',()=>{
-      document.getElementById('loginPane').classList.remove('hidden');
-      document.getElementById('registerPane').classList.add('hidden');
-      tabLogin.classList.remove('btn2'); tabRegister.classList.add('btn2');
-    });
-    tabRegister.addEventListener('click',()=>{
-      document.getElementById('registerPane').classList.remove('hidden');
-      document.getElementById('loginPane').classList.add('hidden');
-      tabRegister.classList.remove('btn2'); tabLogin.classList.add('btn2');
-    });
-
-
-    // --- Access/Auth/API helpers ---
-    const API = {
-      token: localStorage.getItem('zevora_token') || '',
-      role: localStorage.getItem('zevora_role') || '',
-      username: localStorage.getItem('zevora_username') || ''
-    };
-
-    function apiHeaders(isJson = true) {
-      const headers = {};
-      if (isJson) headers['Content-Type'] = 'application/json';
-      if (API.token) headers['Authorization'] = `Bearer ${API.token}`;
-      return headers;
+      document.querySelectorAll('[data-view]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === name);
+      });
     }
 
     function updateAuthUI() {
-      const authInfo = document.getElementById('authInfo');
-      if (API.token) {
-        authInfo.textContent = `已登录: ${API.username} (${API.role})`;
-      } else {
-        authInfo.textContent = '未登录';
-      }
-      document.getElementById('adminPanel').style.display = API.role === 'admin' ? 'block' : 'none';
+      const loggedIn = Boolean(API.token);
+      document.getElementById('whoami').textContent = loggedIn ? `${API.username} (${API.role})` : '未登录';
+      document.getElementById('authInfo').textContent = loggedIn ? `已登录: ${API.username} (${API.role})` : '未登录';
+      const isAdmin = API.role === 'admin';
+      document.getElementById('adminDenied').classList.toggle('hidden', isAdmin);
+      document.getElementById('adminBody').classList.toggle('hidden', !isAdmin);
     }
 
     async function login() {
@@ -695,7 +216,7 @@
       const body = new URLSearchParams({ username, password });
       const res = await fetch('/api/token', { method: 'POST', body });
       if (!res.ok) {
-        document.getElementById('authInfo').textContent = '登录失败';
+        document.getElementById('authInfo').textContent = '登录失败，请检查账号密码';
         return;
       }
       const data = await res.json();
@@ -706,8 +227,35 @@
       localStorage.setItem('zevora_role', API.role);
       localStorage.setItem('zevora_username', API.username);
       updateAuthUI();
-      if (API.role === 'admin') await loadAdminOverview();
       await loadMessages();
+      await loadAdminOverview();
+    }
+
+    async function registerUser() {
+      const username = document.getElementById('regUser').value.trim();
+      const password = document.getElementById('regPass').value;
+      const info = document.getElementById('registerInfo');
+      const res = await fetch('/api/register', {
+        method: 'POST',
+        headers: headers(true),
+        body: JSON.stringify({ username, password })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        info.textContent = `注册失败: ${err.detail || res.status}`;
+        return;
+      }
+      info.textContent = '注册成功，请使用新账号登录。';
+    }
+
+    function logout() {
+      API.token = '';
+      API.role = '';
+      API.username = '';
+      localStorage.removeItem('zevora_token');
+      localStorage.removeItem('zevora_role');
+      localStorage.removeItem('zevora_username');
+      updateAuthUI();
     }
 
     async function askAI() {
@@ -715,13 +263,13 @@
       if (!prompt) return;
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
-        headers: apiHeaders(true),
+        headers: headers(true),
         body: JSON.stringify({ prompt })
       });
       const box = document.getElementById('aiReply');
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        box.textContent = `AI request failed: ${err.detail || res.status}`;
+        box.textContent = `请求失败: ${err.detail || res.status}`;
         return;
       }
       const data = await res.json();
@@ -733,7 +281,7 @@
       if (!content) return;
       const res = await fetch('/api/messages', {
         method: 'POST',
-        headers: apiHeaders(true),
+        headers: headers(true),
         body: JSON.stringify({ content })
       });
       const status = document.getElementById('messageStatus');
@@ -751,12 +299,13 @@
       const res = await fetch('/api/messages');
       if (!res.ok) return;
       const data = await res.json();
-      const box = document.getElementById('messageList');
-      box.innerHTML = data.items.slice(0, 8).map(i => `<div>• <strong>${i.author}</strong>: ${i.content}</div>`).join('') || '暂无留言';
+      const html = data.items.map(i => `<div class="message-item"><b>${i.author}</b>${i.content}</div>`).join('') || '暂无留言';
+      document.getElementById('messageList').innerHTML = html;
     }
 
     async function loadAdminOverview() {
-      const res = await fetch('/api/admin/overview', { headers: apiHeaders(false) });
+      if (API.role !== 'admin') return;
+      const res = await fetch('/api/admin/overview', { headers: headers(false) });
       if (!res.ok) return;
       const data = await res.json();
       document.getElementById('allowGuestAiChk').checked = !!data.settings.allow_guest_ai;
@@ -765,14 +314,16 @@
     }
 
     async function saveSettings() {
-      await fetch('/api/admin/settings', {
+      const res = await fetch('/api/admin/settings', {
         method: 'PATCH',
-        headers: apiHeaders(true),
+        headers: headers(true),
         body: JSON.stringify({
           allow_guest_ai: document.getElementById('allowGuestAiChk').checked,
           allow_guest_messages: document.getElementById('allowGuestMsgChk').checked
         })
       });
+      if (!res.ok) return;
+      await loadAdminOverview();
     }
 
     async function createVisitor() {
@@ -780,38 +331,51 @@
       if (!username) return;
       const res = await fetch('/api/admin/visitors', {
         method: 'POST',
-        headers: apiHeaders(true),
+        headers: headers(true),
         body: JSON.stringify({ username })
       });
       const out = document.getElementById('visitorCreated');
       if (!res.ok) {
-        out.textContent = '创建失败';
+        const err = await res.json().catch(() => ({}));
+        out.textContent = `创建失败: ${err.detail || res.status}`;
         return;
       }
       const data = await res.json();
-      out.textContent = `visitor: ${data.username}  pass: ${data.password}`;
+      out.textContent = `已创建: ${data.username} / 密码: ${data.password}`;
       await loadVisitors();
     }
 
     async function loadVisitors() {
-      const res = await fetch('/api/admin/visitors', { headers: apiHeaders(false) });
+      const res = await fetch('/api/admin/visitors', { headers: headers(false) });
       if (!res.ok) return;
       const data = await res.json();
-      document.getElementById('visitorList').innerHTML = data.items.map(i => `• ${i.username} (${i.enabled ? 'enabled' : 'disabled'})`).join('<br/>') || '暂无访客账号';
+      const html = data.items.map(i => `${i.username} (${i.enabled ? 'enabled' : 'disabled'})`).join('<br>') || '暂无访客账号';
+      document.getElementById('visitorList').innerHTML = html;
     }
 
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('zevora_theme', next);
+    }
+
+    document.querySelectorAll('[data-view]').forEach(btn => {
+      btn.addEventListener('click', () => switchView(btn.dataset.view));
+    });
     document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('registerBtn').addEventListener('click', registerUser);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
     document.getElementById('askAiBtn').addEventListener('click', askAI);
     document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
     document.getElementById('saveSettingsBtn').addEventListener('click', saveSettings);
     document.getElementById('createVisitorBtn').addEventListener('click', createVisitor);
+    document.getElementById('themeBtn').addEventListener('click', toggleTheme);
 
+    document.documentElement.setAttribute('data-theme', localStorage.getItem('zevora_theme') || 'light');
     updateAuthUI();
     loadMessages();
-    if (API.role === 'admin') loadAdminOverview();
-
-    // --- Footer Year ---
-    document.getElementById('year').textContent = new Date().getFullYear();
+    loadAdminOverview();
   </script>
 </body>
 </html>
